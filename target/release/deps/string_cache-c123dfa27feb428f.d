@@ -1,0 +1,11 @@
+/Users/emmaguo/rust_starter/target/release/deps/string_cache-c123dfa27feb428f.rmeta: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/atom.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/dynamic_set.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/static_sets.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/trivial_impls.rs
+
+/Users/emmaguo/rust_starter/target/release/deps/libstring_cache-c123dfa27feb428f.rlib: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/atom.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/dynamic_set.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/static_sets.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/trivial_impls.rs
+
+/Users/emmaguo/rust_starter/target/release/deps/string_cache-c123dfa27feb428f.d: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/atom.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/dynamic_set.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/static_sets.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/trivial_impls.rs
+
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/lib.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/atom.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/dynamic_set.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/static_sets.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/string_cache-0.8.2/src/trivial_impls.rs:

@@ -1,0 +1,12 @@
+/Users/emmaguo/rust_starter/target/wasm32-unknown-unknown/release/deps/arrayvec-e7836ab68c15c03a.rmeta: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/maybe_uninit.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array_string.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/char.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/errors.rs
+
+/Users/emmaguo/rust_starter/target/wasm32-unknown-unknown/release/deps/libarrayvec-e7836ab68c15c03a.rlib: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/maybe_uninit.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array_string.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/char.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/errors.rs
+
+/Users/emmaguo/rust_starter/target/wasm32-unknown-unknown/release/deps/arrayvec-e7836ab68c15c03a.d: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/maybe_uninit.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array_string.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/char.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/errors.rs
+
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/lib.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/maybe_uninit.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/array_string.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/char.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.5.2/src/errors.rs:

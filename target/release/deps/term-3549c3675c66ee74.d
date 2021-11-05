@@ -1,0 +1,12 @@
+/Users/emmaguo/rust_starter/target/release/deps/term-3549c3675c66ee74.rmeta: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/mod.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/searcher.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/compiled.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/names.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parm.rs
+
+/Users/emmaguo/rust_starter/target/release/deps/libterm-3549c3675c66ee74.rlib: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/mod.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/searcher.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/compiled.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/names.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parm.rs
+
+/Users/emmaguo/rust_starter/target/release/deps/term-3549c3675c66ee74.d: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/mod.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/searcher.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/compiled.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/names.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parm.rs
+
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/lib.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/mod.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/searcher.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/compiled.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parser/names.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/term-0.7.0/src/terminfo/parm.rs:

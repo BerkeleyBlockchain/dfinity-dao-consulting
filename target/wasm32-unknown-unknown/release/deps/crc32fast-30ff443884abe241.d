@@ -1,0 +1,11 @@
+/Users/emmaguo/rust_starter/target/wasm32-unknown-unknown/release/deps/crc32fast-30ff443884abe241.rmeta: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/baseline.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/combine.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/specialized/mod.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/table.rs
+
+/Users/emmaguo/rust_starter/target/wasm32-unknown-unknown/release/deps/libcrc32fast-30ff443884abe241.rlib: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/baseline.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/combine.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/specialized/mod.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/table.rs
+
+/Users/emmaguo/rust_starter/target/wasm32-unknown-unknown/release/deps/crc32fast-30ff443884abe241.d: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/baseline.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/combine.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/specialized/mod.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/table.rs
+
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/lib.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/baseline.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/combine.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/specialized/mod.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/crc32fast-1.2.1/src/table.rs:

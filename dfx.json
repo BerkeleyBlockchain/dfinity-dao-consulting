@@ -1,8 +1,10 @@
 {
   "canisters": {
     "rust_starter": {
-      "main": "src/rust_starter/main.mo",
-      "type": "motoko"
+      "build": "cargo build --target wasm32-unknown-unknown --package rust_starter --release",
+      "candid": "src/rust_starter/src/rust_starter.did",
+      "wasm": "target/wasm32-unknown-unknown/release/rust_starter.wasm",
+      "type": "custom"
     },
     "rust_starter_assets": {
       "dependencies": [

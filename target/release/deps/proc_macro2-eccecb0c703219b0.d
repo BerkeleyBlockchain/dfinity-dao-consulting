@@ -1,0 +1,12 @@
+/Users/emmaguo/rust_starter/target/release/deps/proc_macro2-eccecb0c703219b0.rmeta: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/marker.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/parse.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/detection.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/fallback.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/wrapper.rs
+
+/Users/emmaguo/rust_starter/target/release/deps/libproc_macro2-eccecb0c703219b0.rlib: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/marker.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/parse.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/detection.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/fallback.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/wrapper.rs
+
+/Users/emmaguo/rust_starter/target/release/deps/proc_macro2-eccecb0c703219b0.d: /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/lib.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/marker.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/parse.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/detection.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/fallback.rs /Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/wrapper.rs
+
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/lib.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/marker.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/parse.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/detection.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/fallback.rs:
+/Users/emmaguo/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.32/src/wrapper.rs:
