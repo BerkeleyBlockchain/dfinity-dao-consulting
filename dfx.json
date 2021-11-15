@@ -22,10 +22,10 @@
     },
     "tokens": {
       "build": "cargo build --target wasm32-unknown-unknown --package tokens --release",
-      "candid": "src/tokens/src/tokens.did",
+      "candid": "src/tokens/src/token.did",
       "wasm": "target/wasm32-unknown-unknown/release/tokens.wasm",
       "type": "custom",
-      "main": "src/tokens/src/token.rs"
+      "main": "src/tokens/src/main.rs"
     }
   },
   "defaults": {
@@ -34,7 +34,7 @@
       "packtool": ""
     }
   },
-  "dfx": "0.8.1",
+  "dfx": "0.8.3",
   "networks": {
     "local": {
       "bind": "127.0.0.1:8000",
