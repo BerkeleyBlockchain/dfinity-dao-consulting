@@ -1,8 +1,3 @@
-// account balance
-// total_supply()
-// send
-// main
-
 /**
 * Module     : main.rs
 * Copyright  : 2021 DFinance Team
@@ -28,6 +23,7 @@ struct Metadata {
     fee: u64,
     fee_to: Principal,
 }
+
 
 #[derive(Deserialize, CandidType, Clone, Debug)]
 struct TokenInfo {
@@ -149,7 +145,8 @@ fn init(
     );
 }
 
-fn _transfer(from: Principal, to: Principal, value: u64) {
+// IMPORTANT: TRANSFERS
+fn _transfer(from: Principal, to: Principal, value: u64, metadata: String) {
     let balances = ic::get_mut::<Balances>();
     let from_balance = balance_of(from);
     let from_balance_new = from_balance - value;
@@ -165,12 +162,12 @@ fn _transfer(from: Principal, to: Principal, value: u64) {
     }
 }
 
-fn _charge_fee(user: Principal, fee_to: Principal, fee: u64) {
-    let metadata = ic::get::<Metadata>();
-    if metadata.fee > 0 {
-        _transfer(user, fee_to, fee);
-    }
-}
+// fn _charge_fee(user: Principal, fee_to: Principal, fee: u64) {
+//     let metadata = ic::get::<Metadata>();
+//     if metadata.fee > 0 {
+//         _transfer(user, fee_to, fee);
+//     }
+// }
 
 #[update(name = "transfer")]
 #[candid_method(update)]
