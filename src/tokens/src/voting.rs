@@ -23,7 +23,7 @@ fn setRankedScores() {
     let vote2 = ic::get::<Vote2>();
     let iter_vote2 = vote2.iter();
     while (iter_vote2 != None) {
-        
+
         iter_vote2 = iter_vote2.next();
     }
     
