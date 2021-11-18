@@ -1,5 +1,7 @@
+mod main
 use std::collections::HashMap;
 use ic_kit::{ic , Principal};
+use num_traits::pow;
 //assuming time is in seconds
 static REWARD_CONST: f32 = 1209600.0;
 
@@ -85,4 +87,16 @@ fn calculateReward(
         reward_amount += reward_mul * val;
     }
     reward_amount
+}
+
+// changed f32 type to u32
+static VOTE_EXPONENT: u32 = 2;
+
+#[ic_cdk_macros::query]
+fn getNumVotes(icpAdded: u32, currVotes: u32) {
+    //new votes: currvotes ^ vote_exp + icpAdded
+    let num_icp = currVotes.pow(VOTE_EXPONENT);
+    num_icp += icpAdded;
+    let conv_ratio = 1 / VOTE_EXPONENT;
+    ic_cdk::print(num_icp.pow(conv_ratio));
 }

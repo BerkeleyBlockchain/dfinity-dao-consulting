@@ -21,15 +21,23 @@ type Vote2 = HashMap<Principal, LinkedList<Principal>>
 
 fn setRankedScores() {
     let vote2 = ic::get::<Vote2>();
-    let iter_vote2 = vote2.iter();
-    while (iter_vote2 != None) {
-
-        iter_vote2 = iter_vote2.next();
+    for (key, value) in vote2.into_iter() {
+        let iter_ranked = value.iter();
+        count = value.len(); // depends on how many they ranked
+        let results2 = ic::get_mut::<Results2>();
+        while (iter_ranked != None) {
+            match results.get(iter_ranked) {
+                Some(votes) => votes + count,
+                None => 0,
+            }
+            iter_ranked = iter_ranked.next();
+            count --;
+        }
     }
     
 }
 
-fn first_vote(
+fn firstVote(
     from: Option<Principal>,
     metadata: HashMap<Principal, bool>,
 ) {
@@ -37,10 +45,12 @@ fn first_vote(
     main::transfer(grantee, BURN_ID, balance, "");
 }
 
-fn second_vote(
+fn secondVote(
     from: Option<Principal>,
     metadata: HashMap<Principal, LinkedList<Principal>>,
 ) {
     // Consider our ranked voting implementation!
 }
 
+// time lock
+// deciding on winner

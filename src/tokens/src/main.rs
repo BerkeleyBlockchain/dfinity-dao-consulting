@@ -146,7 +146,7 @@ fn init(
 }
 
 // IMPORTANT: TRANSFERS
-fn _transfer(from: Principal, to: Principal, value: u64, metadata: String) {
+fn _transfer(from: Principal, to: Principal, value: u64) {
     let balances = ic::get_mut::<Balances>();
     let from_balance = balance_of(from);
     let from_balance_new = from_balance - value;
@@ -162,12 +162,12 @@ fn _transfer(from: Principal, to: Principal, value: u64, metadata: String) {
     }
 }
 
-// fn _charge_fee(user: Principal, fee_to: Principal, fee: u64) {
-//     let metadata = ic::get::<Metadata>();
-//     if metadata.fee > 0 {
-//         _transfer(user, fee_to, fee);
-//     }
-// }
+fn _charge_fee(user: Principal, fee_to: Principal, fee: u64) {
+    let metadata = ic::get::<Metadata>();
+    if metadata.fee > 0 {
+        _transfer(user, fee_to, fee);
+    }
+}
 
 #[update(name = "transfer")]
 #[candid_method(update)]

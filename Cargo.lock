@@ -1290,6 +1290,7 @@ dependencies = [
  "ic-cdk",
  "ic-cdk-macros",
  "ic-kit",
+ "num-traits",
  "serde",
 ]
 

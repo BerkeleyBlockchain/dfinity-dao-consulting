@@ -1,0 +1,11 @@
+type Vote1Status = record {
+  yes : nat64;
+  yes : nat64;
+};
+service : (text, text, text, nat8, nat64, principal, nat64, bool, f64, HashMap) -> {
+  setRankedScores : () ->();
+  firstVote : (principal, HashMap) ->();
+  secondVote : (principal, HashMap) ->();
+  getNumVotes : (nat32, nat32) ->() query
+
+}

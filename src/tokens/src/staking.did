@@ -1,0 +1,11 @@
+type Transaction = record {
+  amount : nat64;
+  time : nat64;
+};
+service : (text, text, text, nat8, nat64, principal, nat64, bool, f64) -> {
+  stake : (principal, nat64, nat64, nat64) ->(bool);
+  removeStake : (principal, nat64, nat64, nat64) ->(bool);
+  calculateReward : (principal, nat64, nat64) ->(f64);
+  getNumVotes : (nat32, nat32) ->() query
+
+}
