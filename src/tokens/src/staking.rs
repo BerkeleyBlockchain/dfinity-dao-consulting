@@ -3,20 +3,28 @@ use std::collections::HashMap;
 use ic_kit::{ic , Principal};
 use num_traits::pow;
 //assuming time is in seconds
-static REWARD_CONST: f32 = 1209600.0;
+static REWARD_CONST: f64 = 1209600.0
+static APY: f64 = 0.08
+static TIME_STEPS_PER_YEAR: u64 = 31536000
+
+
 
 type Stakers = HashMap<Principal, u64>;
+type UnlockedFunds = HashMap<Principal, u64>
 type Transactions = HashMap<Principal, LinkedList<Transaction>>;
 
 struct Transaction {
     amount: u64,
     time: u64,
+    locktime: u64,
+    return_amount: f64
 }
 
 fn stake(
     caller: Option<Principal>,
     amount: u64,
     fee: u64,
+    locktime u64,
     timestamp: u64,
 ) -> bool {
     let stakers = ic::get_mut::<Stakers>();
@@ -30,13 +38,56 @@ fn stake(
         transactions.insert(caller, LinkedList::new());
     }
     let tx_list = transactions.get(caller)
-    tx_list.push_back(Transaction{
+    let mut transactionNew = Transaction {
         amount: amount,
-        time: time,
-    });
+        time: timestamp,
+        locktime: locktime,
+        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
+    };
+
+    tx_list.push_back(transactionNew);
     
     true
 }
+
+
+fn removeUnlocked(
+    caller: Option<Principal>,
+    amount: u64,
+    fee: u64,
+    timestamp: u64,
+) -> bool {
+    //transfer out
+    let amt_avail = getUnlockedAmount(caller, fee, timestamp)
+    if amount > amt_avail {
+        
+    }
+}
+
+fn removeUnlockedAll(
+    caller: Option<Principal>,
+    fee: u64,
+    timestamp: u64,
+) -> u64 {
+
+}
+
+fn unlockFunds(
+    caller: Option<Principal>,
+    fee: u64,
+    timestamp: u64,
+) -> u64 {
+
+}
+
+fn getUnlockedAmount(
+    caller: Option<Principal>,
+    fee: u64,
+    timestamp: u64,
+) -> u64 {
+
+}
+
 
 fn removeStake(
     caller: Option<Principal>,
@@ -68,6 +119,17 @@ fn removeStake(
         }
     }
     true
+}
+
+fn calculateReturnLocked(
+    caller: Option<Principal>,
+    fee: u64,
+    timestamp: u64,
+    locktime: u64,
+    amount: u64
+) -> f64 {
+    let num_years = locktime / TIME_STEPS_PER_YEAR
+    num_years * APY * amount + amount
 }
 
 fn calculateReward(

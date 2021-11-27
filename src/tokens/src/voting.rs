@@ -7,10 +7,13 @@ use ic_kit::{ic , Principal};
 type Results1 = HashMap<Principal, Vote1Status>;
 type Results2 = HashMap<Principal, u64>;
 
+type Winners1 = LinkedList<Principal>;
+
 static BURN_ID: Principal "0x9762D80271de8fa872A2a1f770E2319c3DF643bC";
 
-type Vote1 = HashMap<Principal, bool>;
+type GrantSizes = LinkedList<u64>;
 
+#[derive(Clone, Copy)]
 struct Vote1Status {
     yes: u64,
     no: u64,
@@ -18,8 +21,14 @@ struct Vote1Status {
 
 type Vote2 = HashMap<Principal, LinkedList<Principal>>
 
+fn setGrantSizes(
+    sizes: LinkedList<u64>
+) {
+    let grant_sizes = ic::get_mut::<GrantSizes>();
+    grant_sizes = sizes;
+}
 
-fn setRankedScores() {
+fn secondVoteScores() {
     let vote2 = ic::get::<Vote2>();
     for (key, value) in vote2.into_iter() {
         let iter_ranked = value.iter();
@@ -43,14 +52,51 @@ fn firstVote(
 ) {
     u64 balance = main::balance_of(caller);
     main::transfer(grantee, BURN_ID, balance, "");
+    let results1 = ic::get_mut::<Results1>();
+    for (key, value) in metadata.into_iter() {
+        if value {
+            // not sure if this is how you do it
+            *results1.get_mut(key).unwrap().yes += 1;
+            // match vote1.get(&key) {
+            //     Some(status) => status->yes + 1,
+            //     None => 0
+            // }
+        } else {
+            *results1.get_mut(key).unwrap().yes += 1;
+        }
+    }
 }
 
 fn secondVote(
     from: Option<Principal>,
-    metadata: HashMap<Principal, LinkedList<Principal>>,
+    metadata: LinkedList<Principal>,
 ) {
-    // Consider our ranked voting implementation!
+    let vote2 = ic::get_mut::<Vote2>();
+    match vote2.get(&from) {
+        Some(ranks) => metadata,
+        None => None
+    }
+    // what to do with token?
 }
 
+fn firstRoundWinners(
+    voter_count: u64
+) {
+    let results1 = ic::get_mut::<Results1>();
+    let winners1 = ic::get_mut::<Winner1>();
+    for (key, value) in results1.into_iter(){
+        curr_voter_count = *value.yes + *value.no;
+        if curr_voter_count >= voter_count * 0.60 {
+            if *value.yes > curr_voter_count * 0.35 {
+                winners1.push_back(key);
+            }
+        }
+    }
+}
+
+fn secondVoteWinners()
+
 // time lock
-// deciding on winner
+// have a way of looking at how many voters there are 
+// have a way at looking at grant sizes
+// need to rank second vote according to grant sizes
