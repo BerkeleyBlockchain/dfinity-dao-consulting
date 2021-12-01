@@ -26,6 +26,13 @@
       "wasm": "target/wasm32-unknown-unknown/release/tokens.wasm",
       "type": "custom",
       "main": "src/tokens/src/main.rs"
+    },
+    "minting": {
+      "build": "cargo build --target wasm32-unknown-unknown --package minting --release",
+      "candid": "src/minting/src/minting.did",
+      "wasm": "target/wasm32-unknown-unknown/release/minting.wasm",
+      "type": "custom",
+      "main": "src/minting/src/main.rs"
     }
   },
   "defaults": {
@@ -34,7 +41,7 @@
       "packtool": ""
     }
   },
-  "dfx": "0.8.3",
+  "dfx": "0.8.4",
   "networks": {
     "local": {
       "bind": "127.0.0.1:8000",

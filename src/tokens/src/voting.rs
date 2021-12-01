@@ -1,4 +1,4 @@
-mod main
+mod token;
 
 use std::collections::HashMap;
 use std::collections::LinkedList;
@@ -46,12 +46,13 @@ fn secondVoteScores() {
     
 }
 
+// list of applications they've looked at 
 fn firstVote(
     from: Option<Principal>,
     metadata: HashMap<Principal, bool>,
 ) {
-    u64 balance = main::balance_of(caller);
-    main::transfer(grantee, BURN_ID, balance, "");
+    u64 balance = token::balance_of(caller);
+    token::transfer(grantee, BURN_ID, balance, "");
     let results1 = ic::get_mut::<Results1>();
     for (key, value) in metadata.into_iter() {
         if value {

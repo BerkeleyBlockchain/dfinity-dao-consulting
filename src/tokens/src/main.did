@@ -1,0 +1,8 @@
+service : (text, text, text, nat8, nat64, principal, nat64, bool, f64, HashMap, LinkedList) -> {
+  joinVoter : (principal, nat64, nat64) ->();
+  createVoteTokens : () ->();
+  castFirstVote : (principal, HashMap) ->();
+  castSecondVote : (principal, LinkedList) ->();
+  submitApp : () ->();
+
+}

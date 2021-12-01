@@ -1,4 +1,4 @@
-mod main
+mod token;
 use std::collections::HashMap;
 use ic_kit::{ic , Principal};
 use num_traits::pow;
@@ -6,8 +6,6 @@ use num_traits::pow;
 static REWARD_CONST: f64 = 1209600.0
 static APY: f64 = 0.08
 static TIME_STEPS_PER_YEAR: u64 = 31536000
-
-
 
 type Stakers = HashMap<Principal, u64>;
 type UnlockedFunds = HashMap<Principal, u64>
@@ -46,7 +44,6 @@ fn stake(
     };
 
     tx_list.push_back(transactionNew);
-    
     true
 }
 
