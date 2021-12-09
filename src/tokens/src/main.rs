@@ -27,6 +27,7 @@ fn joinVoter (
 // create vote tokens, everytime local network is spun up
 fn createVoteTokens() {
     // call to the token canister
+    api::call::call("rrkah-fqaaa-aaaaa-aaaaq-cai", "setMetadata", (first_arg, second_arg)).await?;
 }
 
 // mint voting tokens
@@ -35,6 +36,9 @@ fn mintVoteTokens(
     amount: u64,
 
 ) {
+
+    let (first_result, second_result) : (first_result_type, second_result_type) = 
+     api::call::call(canister_id, "method", (first_arg, second_arg)).await?;
 
 }
 
@@ -57,13 +61,24 @@ fn castSecondVote(
 
 // submit application
 fn submitApp(
-
+    caller: Option<Principal>,
+    application: String, 
+    grantSize: u64
 ) {
+    // make a transfer to DFINITY for applciation fee
+
+    // add caller to hashmap
+    voting::addApplicant(caller, grantSize);
 
 }
 
 // delegate voting tokens to others
 // setting grant sizes
+fn grantSizes(
+    sizes:LinkedList<u64>
+) {
+    voting::setGrantSizes(sizes);
+}
 // get voters (from staking.rs)
 
 // might add this do main.rs here, or to the rust_starter canister?

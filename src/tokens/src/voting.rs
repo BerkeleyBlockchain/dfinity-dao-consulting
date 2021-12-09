@@ -13,6 +13,9 @@ static BURN_ID: Principal "0x9762D80271de8fa872A2a1f770E2319c3DF643bC";
 
 type GrantSizes = LinkedList<u64>;
 
+// lists applicant and the grant size they are applying for
+type Applicants = LinkedList<Principal, u64>;
+
 #[derive(Clone, Copy)]
 struct Vote1Status {
     yes: u64,
@@ -20,6 +23,15 @@ struct Vote1Status {
 }
 
 type Vote2 = HashMap<Principal, LinkedList<Principal>>
+
+fn addApplicant(
+    caller: Option<Principal>,
+    grantSize: u64
+) {
+    let applicants = ic::get_mut::<Applicants>();
+    applicants.push_back(caller, grantSize);
+}
+
 
 fn setGrantSizes(
     sizes: LinkedList<u64>

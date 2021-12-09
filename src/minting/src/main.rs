@@ -1,10 +1,3 @@
-/**
-* Module     : main.rs
-* Copyright  : 2021 DFinance Team
-* License    : Apache 2.0 with LLVM Exception
-* Maintainer : DFinance Team <hello@dfinance.ai>
-* Stability  : Experimental
-*/
 use candid::{candid_method, CandidType, Deserialize};
 use ic_kit::{ic , Principal};
 use ic_cdk_macros::*;
@@ -23,7 +16,6 @@ struct Metadata {
     fee: u64,
     fee_to: Principal,
 }
-
 
 #[derive(Deserialize, CandidType, Clone, Debug)]
 struct TokenInfo {
@@ -387,6 +379,29 @@ fn owner() -> Principal {
 #[candid_method(query, rename = "getMetadta")]
 fn get_metadata() -> Metadata {
     ic::get::<Metadata>().clone()
+}
+
+#[update(name = "setMetadata")]
+#[candid_method(query, rename = "setMetadta")]
+fn set_metadata(
+    logo: String,
+    name: String,
+    symbol: String,
+    decimals: u8,
+    total_supply: u64,
+    owner: Principal,
+    fee: u64,
+    fee_to: Principal,
+) {
+    let metadata = ic::get_mut::<Metadata>();
+    set_logo(logo);
+    metadata.name = name;
+    metadata.symbol = symbol;
+    metadata.decimals = decimals;
+    metadata.total_supply = total_supply;
+    set_owner(owner);
+    set_fee(fee);
+    set_fee_to(fee_to);
 }
 
 #[query(name = "historySize")]
