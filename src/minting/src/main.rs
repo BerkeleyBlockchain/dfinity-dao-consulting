@@ -368,6 +368,15 @@ fn total_supply() -> u64 {
     metadata.total_supply
 }
 
+#[query(name = "addTotalSupply")]
+#[candid_method(query, rename = "addTotalSupply")]
+fn total_supply(
+    amount: u64
+) -> u64 {
+    metadata.total_supply += amount;
+    metadata.total_supply
+}
+
 #[query(name = "owner")]
 #[candid_method(query)]
 fn owner() -> Principal {
