@@ -4,6 +4,12 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
+const FRONTEND_DIR = "rust_starter_assets";
+const IS_DEVELOPMENT = process.env.NODE_ENV !== "production";
+
+// During development route /api requests to this URL
+const DEV_PROXY = process.env.DEV_PROXY || "http://localhost:8000";
+
 let localCanisters, prodCanisters, canisters;
 
 function initCanisterIds() {
@@ -31,25 +37,24 @@ function initCanisterIds() {
 }
 initCanisterIds();
 
-const isDevelopment = process.env.NODE_ENV !== "production";
 const asset_entry = path.join(
   "src",
-  "rust_starter_assets",
+  FRONTEND_DIR,
   "src",
   "index.html"
 );
 
 module.exports = {
   target: "web",
-  mode: isDevelopment ? "development" : "production",
+  mode: IS_DEVELOPMENT ? "development" : "production",
   entry: {
     // The frontend.entrypoint points to the HTML file for this build, so we need
     // to replace the extension to `.js`.
     index: path.join(__dirname, asset_entry).replace(/\.html$/, ".js"),
   },
-  devtool: isDevelopment ? "source-map" : false,
+  devtool: IS_DEVELOPMENT ? "source-map" : false,
   optimization: {
-    minimize: !isDevelopment,
+    minimize: !IS_DEVELOPMENT,
     minimizer: [new TerserPlugin()],
   },
   resolve: {
@@ -104,11 +109,11 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-        pathRewrite: {
-          "^/api": "/api",
-        },
+        target: DEV_PROXY,
+        // changeOrigin: true,
+        // pathRewrite: {
+        //   "^/api": "/api",
+        // },
       },
     },
     hot: true,
