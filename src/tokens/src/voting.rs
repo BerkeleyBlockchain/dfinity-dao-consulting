@@ -3,8 +3,8 @@
 use std::collections::HashMap;
 use std::collections::LinkedList;
 use ic_kit::{ic , Principal};
-
-use ic_types::Principal;
+//TODO:
+// use ic_types::Principal; should cargo instll this
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
@@ -13,8 +13,10 @@ type Results2 = HashMap<Principal, u64>;
 
 type Winners1 = LinkedList<Principal>;
 
-let BURN_ID = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
-let GRANTEE = Principal::from_str("czno4-rk7jd-ohw6i-iub4f-atz6u-nkz7y-2bzw3-lutwk-ojg6j-axjew-lae").unwrap();
+static BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
+static GRANTEE: Principal = Principal::from_str("czno4-rk7jd-ohw6i-iub4f-atz6u-nkz7y-2bzw3-lutwk-ojg6j-axjew-lae").unwrap();
+// let BURN_ID = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
+// let GRANTEE = Principal::from_str("czno4-rk7jd-ohw6i-iub4f-atz6u-nkz7y-2bzw3-lutwk-ojg6j-axjew-lae").unwrap();
 
 type GrantSizes = LinkedList<u64>;
 

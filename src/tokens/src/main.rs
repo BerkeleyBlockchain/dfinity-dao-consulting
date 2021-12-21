@@ -26,9 +26,10 @@ fn joinVoter (
 }
 
 // create vote tokens, everytime local network is spun up
-fn createVoteTokens() {
+async fn createVoteTokens() {
     // call to the token canister
-    ic_cdk::api::call::call("rrkah-fqaaa-aaaaa-aaaaq-cai", "init", ("logo", "name", "symbol", 18, 10, "czno4-rk7jd-ohw6i-iub4f-atz6u-nkz7y-2bzw3-lutwk-ojg6j-axjew-lae", 1, "fee_to")).await?;
+    // Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap()
+    ic_cdk::api::call::call(Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap(), "init", ("logo", "name", "symbol", 18, 10, "czno4-rk7jd-ohw6i-iub4f-atz6u-nkz7y-2bzw3-lutwk-ojg6j-axjew-lae", 1, "fee_to")).await?;
     //ic_cdk::api::call(candid::Principal::management_canister(), "create_canister", ()).await?;
 }
 

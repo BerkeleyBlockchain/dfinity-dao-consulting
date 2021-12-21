@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::collections::LinkedList;
 use ic_kit::{ic , Principal};
 use num_traits::pow;
-use chrono::prelude::*;
+// use chrono::prelude::*;
 //assuming time is in seconds
 static REWARD_CONST: f64 = 1209600.0;
 static APY: f64 = 0.08;
@@ -21,12 +21,13 @@ struct Transaction {
 }
 
 pub fn stake(
-    caller: Option<Principal>,
+    caller: Principal,
     amount: u64,
     fee: u64,
     locktime: u64,
     timestamp: u64,
 ) -> bool {
+    // difference 
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
     if !stakers.contains_key(caller) {
@@ -44,15 +45,15 @@ pub fn stake(
         locktime: locktime,
         return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
     };
-
-    tx_list.insert(locktime + timestamp, transactionNew);
+    // whas tx_list before, but changed since it was giving error
+    tx_map.insert(locktime + timestamp, transactionNew);
 
     true
 }
 
 
 fn removeUnlocked(
-    caller: Option<Principal>,
+    caller: Principal,
     amount: u64,
     fee: u64,
     timestamp: u64
@@ -72,7 +73,7 @@ fn removeUnlocked(
 }
 
 fn removeUnlockedAll(
-    caller: Option<Principal>,
+    caller: Principal,
     fee: u64,
     timestamp: u64,
 ) -> u64 {
@@ -84,7 +85,7 @@ fn removeUnlockedAll(
 }
 
 fn unlockFunds(
-    caller: Option<Principal>,
+    caller: Principal,
     fee: u64,
     timestamp: u64,
 ) -> u64 {
@@ -105,7 +106,7 @@ fn unlockFunds(
 }
 
 fn getUnlockedAmount(
-    caller: Option<Principal>,
+    caller: Principal,
     fee: u64,
     timestamp: u64,
 ) -> u64 {
@@ -147,7 +148,7 @@ fn getUnlockedAmount(
 // }
 
 fn calculateReturnLocked(
-    caller: Option<Principal>,
+    caller: Principal,
     fee: u64,
     timestamp: u64,
     locktime: u64,
