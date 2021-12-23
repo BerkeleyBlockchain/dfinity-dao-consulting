@@ -10,10 +10,10 @@
     },
     "tokens": {
       "build": "cargo build --target wasm32-unknown-unknown --package tokens --release",
-      "candid": "src/tokens/src/token.did",
+      "candid": "src/tokens/src/tokens.did",
       "wasm": "target/wasm32-unknown-unknown/release/tokens.wasm",
       "type": "custom",
-      "main": "src/tokens/src/lib.rs"
+      "main": "src/tokens/src/main.rs"
     },
     "minting": {
       "build": "cargo build --target wasm32-unknown-unknown --package minting --release",

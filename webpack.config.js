@@ -76,6 +76,9 @@ module.exports = {
         },
       ],
     }),
+    new webpack.ProvidePlugin({
+      Buffer: [require.resolve("buffer/"), "Buffer"],
+    }),
   ],
   // proxy /api to port 8000 during development
   devServer: {

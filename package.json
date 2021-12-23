@@ -11,8 +11,8 @@
     "copy:types": "rsync -avr .dfx/$(echo ${DFX_NETWORK:-'**'})/canisters/** --exclude='assets/' --exclude='idl/' --exclude='*.wasm' --delete src/declarations"
   },
   "devDependencies": {
-    "@dfinity/agent": "0.10.1",
-    "@dfinity/principal": "0.10.1",
+    "@dfinity/agent": "^0.10.2",
+    "@dfinity/principal": "^0.10.2",
     "copy-webpack-plugin": "^9.0.1",
     "html-webpack-plugin": "5.3.1",
     "source-map-loader": "^3.0.0",
@@ -28,5 +28,8 @@
     "last 2 firefox version",
     "last 2 safari version",
     "last 2 edge version"
-  ]
+  ],
+  "dependencies": {
+    "buffer": "^6.0.3"
+  }
 }

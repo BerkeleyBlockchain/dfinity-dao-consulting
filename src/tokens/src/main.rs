@@ -3,15 +3,28 @@ mod staking;
 
 // use chrono::prelude::*;
 use std::collections::HashMap;
+use candid::candid_method;
 use ic_kit::{ic, Principal};
 use ic_kit::macros::*;
 use std::collections::LinkedList;
 
+// Submits a grant application for a user
+#[candid_method(update)]
+pub fn submitApp(
+    application: String, 
+    grantSize: u64
+) {
+    // TODO: make a transfer to DFINITY for applciation fee
+
+    // add caller to hashmap
+    voting::addApplicant(ic::caller(), grantSize);
+}
+
 // not sure what the "fee" argument is in the stake function
 // make sure quadratic staking is working
 // join as a voter + stake
-#[update]
-fn joinVoter(
+#[candid_method(update)]
+pub fn joinVoter(
     amount: u64,
     locktime: u64,
 ) {
@@ -77,18 +90,6 @@ fn castSecondVote(
     voting::secondVote(ic::caller(), votes);
 }
 
-// Submits a grant application for a user
-#[update]
-fn submitApp(
-    application: String, 
-    grantSize: u64
-) {
-    // TODO: make a transfer to DFINITY for applciation fee
-
-    // add caller to hashmap
-    voting::addApplicant(ic::caller(), grantSize);
-}
-
 // delegate voting tokens to others
 // setting grant sizes
 fn grantSizes(
@@ -98,6 +99,16 @@ fn grantSizes(
 }
 // get voters (from staking.rs)
 
-// might add this do main.rs here, or to the rust_starter canister?
+// TODO in main
 // create internet identity
 // start voting period - probably want a portal for dfinity
+
+
+#[cfg(any(target_arch = "wasm32", test))]
+fn main() {}
+
+#[cfg(not(any(target_arch = "wasm32", test)))]
+fn main() {
+    candid::export_service!();
+    std::print!("{}", __export_service());
+}
