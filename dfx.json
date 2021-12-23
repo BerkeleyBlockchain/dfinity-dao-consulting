@@ -1,23 +1,11 @@
 {
   "canisters": {
-    "rust_starter": {
-      "build": "cargo build --target wasm32-unknown-unknown --package rust_starter --release",
-      "candid": "src/rust_starter/src/rust_starter.did",
-      "wasm": "target/wasm32-unknown-unknown/release/rust_starter.wasm",
-      "type": "custom",
-      "main": "src/rust_starter/src/lib.rs"
-    },
-    "rust_starter_assets": {
-      "dependencies": [
-        "rust_starter"
-      ],
+    "frontend": {
+      "dependencies": ["tokens"],
       "frontend": {
-        "entrypoint": "src/rust_starter_assets/src/index.html"
+        "entrypoint": "src/frontend/src/index.html"
       },
-      "source": [
-        "src/rust_starter_assets/assets",
-        "dist/rust_starter_assets/"
-      ],
+      "source": ["src/frontend/assets", "dist/frontend/"],
       "type": "assets"
     },
     "tokens": {
@@ -33,12 +21,6 @@
       "wasm": "target/wasm32-unknown-unknown/release/minting.wasm",
       "type": "custom",
       "main": "src/minting/src/main.rs"
-    }
-  },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": ""
     }
   },
   "dfx": "0.8.4",

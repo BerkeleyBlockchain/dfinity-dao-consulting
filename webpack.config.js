@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-const FRONTEND_DIR = "rust_starter_assets";
+const FRONTEND_DIR = "frontend";
 const IS_DEVELOPMENT = process.env.NODE_ENV !== "production";
 
 // During development route /api requests to this URL
@@ -14,7 +14,11 @@ let localCanisters, prodCanisters, canisters;
 
 function initCanisterIds() {
   try {
-    localCanisters = require(path.resolve(".dfx", "local", "canister_ids.json"));
+    localCanisters = require(path.resolve(
+      ".dfx",
+      "local",
+      "canister_ids.json"
+    ));
   } catch (error) {
     console.log("No local canister_ids.json found. Continuing production");
   }
@@ -37,20 +41,13 @@ function initCanisterIds() {
 }
 initCanisterIds();
 
-const asset_entry = path.join(
-  "src",
-  FRONTEND_DIR,
-  "src",
-  "index.html"
-);
-
 module.exports = {
   target: "web",
   mode: IS_DEVELOPMENT ? "development" : "production",
   entry: {
     // The frontend.entrypoint points to the HTML file for this build, so we need
     // to replace the extension to `.js`.
-    index: path.join(__dirname, asset_entry).replace(/\.html$/, ".js"),
+    index: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.js"),
   },
   devtool: IS_DEVELOPMENT ? "source-map" : false,
   optimization: {
@@ -69,7 +66,7 @@ module.exports = {
   },
   output: {
     filename: "index.js",
-    path: path.join(__dirname, "dist", "rust_starter_assets"),
+    path: path.join(__dirname, "dist", FRONTEND_DIR),
   },
 
   // Depending in the language or framework you are using for
@@ -85,20 +82,16 @@ module.exports = {
   // },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, asset_entry),
-      cache: false
+      template: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.html"),
+      cache: false,
     }),
     new CopyPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "src", "rust_starter_assets", "assets"),
-          to: path.join(__dirname, "dist", "rust_starter_assets"),
+          from: path.join(__dirname, "src", FRONTEND_DIR, "assets"),
+          to: path.join(__dirname, "dist", FRONTEND_DIR),
         },
       ],
-    }),
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development',
-      RUST_STARTER_CANISTER_ID: canisters["rust_starter"]
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
@@ -117,7 +110,7 @@ module.exports = {
       },
     },
     hot: true,
-    contentBase: path.resolve(__dirname, "./src/rust_starter_assets"),
-    watchContentBase: true
+    contentBase: path.join(__dirname, "src", FRONTEND_DIR),
+    watchContentBase: true,
   },
 };

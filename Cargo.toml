@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "src/rust_starter",
     "src/tokens",
     "src/minting",
 ]
