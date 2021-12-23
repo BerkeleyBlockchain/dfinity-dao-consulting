@@ -44,11 +44,7 @@ initCanisterIds();
 module.exports = {
   target: "web",
   mode: IS_DEVELOPMENT ? "development" : "production",
-  entry: {
-    // The frontend.entrypoint points to the HTML file for this build, so we need
-    // to replace the extension to `.js`.
-    index: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.js"),
-  },
+  entry: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.ts"),
   devtool: IS_DEVELOPMENT ? "source-map" : false,
   optimization: {
     minimize: !IS_DEVELOPMENT,
@@ -56,30 +52,17 @@ module.exports = {
   },
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx"],
-    fallback: {
-      assert: require.resolve("assert/"),
-      buffer: require.resolve("buffer/"),
-      events: require.resolve("events/"),
-      stream: require.resolve("stream-browserify/"),
-      util: require.resolve("util/"),
-    },
   },
   output: {
-    filename: "index.js",
+    filename: "[id].bundle.js",
     path: path.join(__dirname, "dist", FRONTEND_DIR),
   },
-
-  // Depending in the language or framework you are using for
-  // front-end development, add module loaders to the default
-  // webpack configuration. For example, if you are using React
-  // modules and CSS as described in the "Adding a stylesheet"
-  // tutorial, uncomment the following lines:
-  // module: {
-  //  rules: [
-  //    { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
-  //    { test: /\.css$/, use: ['style-loader','css-loader'] }
-  //  ]
-  // },
+  module: {
+    rules: [
+      { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
+      { test: /\.js$/, loader: "source-map-loader" },
+    ],
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.html"),
@@ -93,10 +76,6 @@ module.exports = {
         },
       ],
     }),
-    new webpack.ProvidePlugin({
-      Buffer: [require.resolve("buffer/"), "Buffer"],
-      process: require.resolve("process/browser"),
-    }),
   ],
   // proxy /api to port 8000 during development
   devServer: {
@@ -109,8 +88,6 @@ module.exports = {
         // },
       },
     },
-    hot: true,
-    contentBase: path.join(__dirname, "src", FRONTEND_DIR),
-    watchContentBase: true,
+    static: path.join(__dirname, "src", FRONTEND_DIR, "assets"),
   },
 };
