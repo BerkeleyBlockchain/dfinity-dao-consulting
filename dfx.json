@@ -13,7 +13,7 @@
       "candid": "src/tokens/src/token.did",
       "wasm": "target/wasm32-unknown-unknown/release/tokens.wasm",
       "type": "custom",
-      "main": "src/tokens/src/main.rs"
+      "main": "src/tokens/src/lib.rs"
     },
     "minting": {
       "build": "cargo build --target wasm32-unknown-unknown --package minting --release",

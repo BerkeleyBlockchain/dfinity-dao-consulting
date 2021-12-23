@@ -1,16 +1,16 @@
 // mod token;
 use std::collections::HashMap;
-use std::collections::LinkedList;
-use ic_kit::{ic , Principal};
-use num_traits::pow;
-// use chrono::prelude::*;
+use ic_kit::{ic, Principal};
+
+// TODO: update since time is returned in nanoseconds
 //assuming time is in seconds
+
 static REWARD_CONST: f64 = 1209600.0;
 static APY: f64 = 0.08;
 static TIME_STEPS_PER_YEAR: u64 = 31536000;
 
 type Stakers = HashMap<Principal, u64>;
-type Unlocked = HashMap<Principal, u64>;
+type Unlocked = HashMap<Principal, u64>; // I think this should be an f64
 type Transactions = HashMap<Principal, HashMap<u64, Transaction>>;
 
 struct Transaction {
@@ -26,29 +26,25 @@ pub fn stake(
     fee: u64,
     locktime: u64,
     timestamp: u64,
-) -> bool {
-    // difference 
+) {
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
-    if !stakers.contains_key(caller) {
-        stakers.insert(caller, 0);
-    }
-    let current : u64 = stakers.get(caller);
-    stakers.insert(caller, amount + current);
-    if !transactions.contains_key(caller) {
-        transactions.insert(caller, LinkedList::new());
-    }
-    let tx_map = transactions.get(caller);
-    let mut transactionNew = Transaction {
+    
+    let currentStake = stakers.get(&caller).copied().unwrap_or(0);
+
+    stakers.insert(caller, amount + currentStake);
+
+    let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
+
+    let newTransaction = Transaction {
         amount: amount,
         time: timestamp,
         locktime: locktime,
         return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
     };
-    // whas tx_list before, but changed since it was giving error
-    tx_map.insert(locktime + timestamp, transactionNew);
 
-    true
+    // whas tx_list before, but changed since it was giving error
+    tx_map.insert(locktime + timestamp, newTransaction);
 }
 
 
@@ -64,9 +60,8 @@ fn removeUnlocked(
     if amount > amt_avail {
         let unlock_amt = getUnlockedAmount(caller, fee, timestamp);
         let unlocked = ic::get_mut::<Unlocked>();
-        unlock_amt -= amount;
-        unlocked.insert(caller, unlock_amt);
-        true;
+        unlocked.insert(caller, unlock_amt - amount);
+        true
     } else {
         false
     }
@@ -81,28 +76,34 @@ fn removeUnlockedAll(
     let unlock_amt = getUnlockedAmount(caller, fee, timestamp);
     let unlocked = ic::get_mut::<Unlocked>();
     unlocked.insert(caller, 0);
-    unlocked;
+    unlock_amt
 }
 
 fn unlockFunds(
     caller: Principal,
     fee: u64,
     timestamp: u64,
-) -> u64 {
+) {
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
     let unlocked = ic::get_mut::<Unlocked>();
-    let new_unlock = unlocked.get(caller);
-    if transactions.contains_key(caller) {
-        let tx_map = transactions.get(caller);
-        for (time, tx) in tx_map {
+
+    // TODO: is this right? Should the unlocked default to zero
+    let mut new_unlock = unlocked.get(&caller).copied().unwrap_or(0);
+
+    if let Some(tx_map) = transactions.get_mut(&caller) {
+        tx_map.retain(|&time, tx| {
             if time > timestamp {
-                new_unlock += tx.return_amount;
-                tx_map.remove(time);
+                // FIXME: u64 + f64 is sketchy.
+                new_unlock = new_unlock + (tx.return_amount as u64);
+                false // Remove this transaction
+            } else {
+                true
             }
-        }
+        });
     }
-    unlocked.insert(caller, new_unlock)
+
+    unlocked.insert(caller, new_unlock);
 }
 
 fn getUnlockedAmount(
@@ -111,7 +112,7 @@ fn getUnlockedAmount(
     timestamp: u64,
 ) -> u64 {
     let unlocked = ic::get_mut::<Unlocked>();
-    unlocked.get(caller);
+    *unlocked.get(&caller).unwrap()
 }
 
 
@@ -154,8 +155,8 @@ fn calculateReturnLocked(
     locktime: u64,
     amount: u64
 ) -> f64 {
-    let num_years = locktime / TIME_STEPS_PER_YEAR;
-    num_years * APY * amount + amount
+    let num_years = (locktime as f64) / (TIME_STEPS_PER_YEAR as f64);
+    num_years * APY * (amount as f64) + (amount as f64)
 }
 
 // fn calculateReward(
@@ -176,15 +177,3 @@ fn calculateReturnLocked(
 //     }
 //     reward_amount
 // }
-
-// changed f32 type to u32
-static VOTE_EXPONENT: u32 = 2;
-
-#[ic_cdk_macros::query]
-fn getNumVotes(icpAdded: u32, currVotes: u32) {
-    //new votes: currvotes ^ vote_exp + icpAdded
-    let num_icp = currVotes.pow(VOTE_EXPONENT);
-    num_icp += icpAdded;
-    let conv_ratio = 1 / VOTE_EXPONENT;
-    ic_cdk::print(num_icp.pow(conv_ratio));
-}
