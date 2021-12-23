@@ -10,9 +10,9 @@ const IS_DEVELOPMENT = process.env.NODE_ENV !== "production";
 // During development route /api requests to this URL
 const DEV_PROXY = process.env.DEV_PROXY || "http://localhost:8000";
 
-let localCanisters, prodCanisters, canisters;
+const getCanistersIds = () => {
+  let localCanisters, prodCanisters;
 
-function initCanisterIds() {
   try {
     localCanisters = require(path.resolve(
       ".dfx",
@@ -22,6 +22,7 @@ function initCanisterIds() {
   } catch (error) {
     console.log("No local canister_ids.json found. Continuing production");
   }
+
   try {
     prodCanisters = require(path.resolve("canister_ids.json"));
   } catch (error) {
@@ -32,14 +33,19 @@ function initCanisterIds() {
     process.env.DFX_NETWORK ||
     (process.env.NODE_ENV === "production" ? "ic" : "local");
 
-  canisters = network === "local" ? localCanisters : prodCanisters;
+  let canisters = network === "local" ? localCanisters : prodCanisters;
+
+  const result = {};
 
   for (const canister in canisters) {
-    process.env[canister.toUpperCase() + "_CANISTER_ID"] =
+    result[canister.toUpperCase() + "_CANISTER_ID"] =
       canisters[canister][network];
   }
-}
-initCanisterIds();
+
+  return result;
+};
+
+const CANISTER_IDS = getCanistersIds();
 
 module.exports = {
   target: "web",
@@ -79,6 +85,7 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
     }),
+    new webpack.EnvironmentPlugin(CANISTER_IDS),
   ],
   // proxy /api to port 8000 during development
   devServer: {

@@ -9,6 +9,7 @@ use ic_kit::macros::*;
 use std::collections::LinkedList;
 
 // Submits a grant application for a user
+#[update]
 #[candid_method(update)]
 pub fn submitApp(
     application: String, 
