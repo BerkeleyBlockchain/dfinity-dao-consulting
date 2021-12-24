@@ -1,30 +1,50 @@
-use std::collections::HashMap;
-use std::collections::LinkedList;
+use std::collections::{HashMap, BTreeMap, LinkedList};
 use std::str::FromStr;
+use ic_cdk_macros::import;
 use ic_kit::{ic, Principal};
+use candid::{CandidType, Deserialize};
 
-type Results1 = HashMap<Principal, VoteStatus>;
-type Results2 = HashMap<Principal, u64>;
+type Results1 = BTreeMap<Principal, VoteStatus>;
+type Results2 = BTreeMap<Principal, u64>;
 type Winners1 = LinkedList<Principal>;
 type GrantSizes = LinkedList<u64>;
 
+type Vote2 = BTreeMap<Principal, LinkedList<Principal>>;
+
 // lists applicant and the grant size they are applying for
-type Applicants = HashMap<Principal, u64>;
+pub type Applications = BTreeMap<Principal, Application>;
+
+#[derive(Deserialize, CandidType, Clone, Debug)]
+pub struct Proposal {
+    name: String,
+    description: String,
+    grant_size: u64
+}
+
+#[derive(Deserialize, CandidType, Clone, Debug)]
+pub struct Application {
+    pub proposal: Proposal,
+    pub create_timestamp: u64,
+    pub principal: Principal,
+}
+
 #[derive(Clone, Copy)]
 struct VoteStatus {
     yes: u64,
     no: u64,
 }
 
-type Vote2 = HashMap<Principal, LinkedList<Principal>>;
+pub fn get_applications() -> &'static Applications {
+    // TODO: add pagination or something.
+    ic::get_mut::<Applications>()
+}
 
-
-pub fn addApplicant(
+pub fn add_application(
     caller: Principal,
-    grantSize: u64
+    application: Application
 ) {
-    let applicants = ic::get_mut::<Applicants>();
-    applicants.insert(caller, grantSize);
+    let applicants = ic::get_mut::<Applications>();
+    applicants.insert(caller, application);
 }
 
 pub fn setGrantSizes(

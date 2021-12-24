@@ -1,39 +1,49 @@
 mod voting;
 mod staking;
 
-// use chrono::prelude::*;
 use std::collections::HashMap;
 use candid::candid_method;
 use ic_kit::{ic, Principal};
 use ic_kit::macros::*;
 use std::collections::LinkedList;
 
+
+
 // Submits a grant application for a user
-#[update]
-#[candid_method(update)]
-pub fn submitApp(
-    application: String, 
-    grantSize: u64
+#[update(name = "submitApp")]
+#[candid_method(update, rename = "submitApp")]
+pub fn submit_app(
+    proposal: voting::Proposal, 
 ) {
     // TODO: make a transfer to DFINITY for applciation fee
-
+    
     // add caller to hashmap
-    voting::addApplicant(ic::caller(), grantSize);
+    voting::add_application(ic::caller(), voting::Application {
+        proposal: proposal,
+        create_timestamp: ic::time(),
+        principal: ic::caller()
+    });
+}
+
+#[query(name = "getApps")]
+#[candid_method(query, rename = "getApps")]
+pub fn get_apps(
+    _page: u32
+) -> Vec<&'static voting::Application> {
+    voting::get_applications().values().collect()
 }
 
 // not sure what the "fee" argument is in the stake function
 // make sure quadratic staking is working
-// join as a voter + stake
-#[candid_method(update)]
-pub fn joinVoter(
+// Joins as voter and stakes some token.
+#[update(name = "joinAsVoter")]
+#[candid_method(update, rename = "joinAsVoter")]
+pub fn join_as_voter(
     amount: u64,
     locktime: u64,
 ) {
-    let caller = ic::caller();
-    let now = ic::time();
-
-    // put 0 for fee
-    staking::stake(caller, amount, 0, locktime, now);
+    static STAKING_FEE: u64 = 0; // No staking fee for now
+    staking::stake(ic::caller(), amount, STAKING_FEE, locktime, ic::time());
 }
 
 // create vote tokens, everytime local network is spun up

@@ -11,6 +11,9 @@ static TIME_STEPS_PER_YEAR: u64 = 31536000;
 
 type Stakers = HashMap<Principal, u64>;
 type Unlocked = HashMap<Principal, u64>; // I think this should be an f64
+
+// This only allows 1 txn per second which may not be what we want. 
+// May be better to use BTreeSet<Transaction>
 type Transactions = HashMap<Principal, HashMap<u64, Transaction>>;
 
 struct Transaction {
@@ -30,13 +33,13 @@ pub fn stake(
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
     
-    let currentStake = stakers.get(&caller).copied().unwrap_or(0);
+    let current_stake = stakers.get(&caller).copied().unwrap_or(0);
 
-    stakers.insert(caller, amount + currentStake);
+    stakers.insert(caller, amount + current_stake);
 
     let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
 
-    let newTransaction = Transaction {
+    let take_tx = Transaction {
         amount: amount,
         time: timestamp,
         locktime: locktime,
@@ -44,7 +47,7 @@ pub fn stake(
     };
 
     // whas tx_list before, but changed since it was giving error
-    tx_map.insert(locktime + timestamp, newTransaction);
+    tx_map.insert(locktime + timestamp, take_tx);
 }
 
 

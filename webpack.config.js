@@ -50,7 +50,7 @@ const CANISTER_IDS = getCanistersIds();
 module.exports = {
   target: "web",
   mode: IS_DEVELOPMENT ? "development" : "production",
-  entry: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.ts"),
+  entry: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.tsx"),
   devtool: IS_DEVELOPMENT ? "source-map" : false,
   optimization: {
     minimize: !IS_DEVELOPMENT,
@@ -66,14 +66,14 @@ module.exports = {
   module: {
     rules: [
       { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
-      { test: /\.js$/, loader: "source-map-loader" },
+      {
+        test: /\.(js|ts|tsx|jsx)$/,
+        exclude: /node_modules/,
+        loader: "source-map-loader",
+      },
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.html"),
-      cache: false,
-    }),
     new CopyPlugin({
       patterns: [
         {
@@ -81,6 +81,10 @@ module.exports = {
           to: path.join(__dirname, "dist", FRONTEND_DIR),
         },
       ],
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.html"),
+      cache: false,
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],

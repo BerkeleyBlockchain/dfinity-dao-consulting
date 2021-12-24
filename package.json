@@ -13,6 +13,8 @@
   "devDependencies": {
     "@dfinity/agent": "^0.10.2",
     "@dfinity/principal": "^0.10.2",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
     "copy-webpack-plugin": "^9.0.1",
     "html-webpack-plugin": "5.3.1",
     "source-map-loader": "^3.0.0",
@@ -30,6 +32,10 @@
     "last 2 edge version"
   ],
   "dependencies": {
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^6.2.1",
+    "swr": "^1.1.1"
   }
 }

@@ -1,1 +1,11 @@
-service : { joinVoter : (nat64, nat64) -> (); submitApp : (text, nat64) -> () }
+type Application = record {
+  "principal" : principal;
+  create_timestamp : nat64;
+  proposal : Proposal;
+};
+type Proposal = record { grant_size : nat64; name : text; description : text };
+service : {
+  getApps : (nat32) -> (vec Application) query;
+  joinAsVoter : (nat64, nat64) -> ();
+  submitApp : (Proposal) -> ();
+}
