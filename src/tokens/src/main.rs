@@ -27,9 +27,7 @@ pub fn submit_app(
 
 #[query(name = "getApps")]
 #[candid_method(query, rename = "getApps")]
-pub fn get_apps(
-    _page: u32
-) -> Vec<&'static voting::Application> {
+pub fn get_apps() -> Vec<&'static voting::Application> {
     voting::get_applications().values().collect()
 }
 

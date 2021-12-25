@@ -14,7 +14,7 @@ const ProposalCard = ({ application }: Props) => (
     to={`/proposal/${application.principal}`}
   >
     <div className="flex-1 text-lg">
-      <h3 className="text-zinc-300 group-hover:text-zinc-200">
+      <h3 className="text-zinc-300 font-medium group-hover:text-zinc-200">
         {application.proposal.name}
       </h3>
       <p>{application.proposal.description}</p>

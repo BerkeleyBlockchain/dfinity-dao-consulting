@@ -10,7 +10,7 @@ export const idlFactory = ({ IDL }) => {
     'proposal' : Proposal,
   });
   return IDL.Service({
-    'getApps' : IDL.Func([IDL.Nat32], [IDL.Vec(Application)], ['query']),
+    'getApps' : IDL.Func([], [IDL.Vec(Application)], ['query']),
     'joinAsVoter' : IDL.Func([IDL.Nat64, IDL.Nat64], [], []),
     'submitApp' : IDL.Func([Proposal], [], []),
   });

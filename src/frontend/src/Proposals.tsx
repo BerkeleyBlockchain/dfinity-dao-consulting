@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import useSWR from "swr";
 import { motion } from "framer-motion";
-import { tokens } from "../../declarations/tokens";
-import { Application } from "../../declarations/tokens/tokens.did";
 import Container from "./Container";
 import ProposalCard from "./ProposalCard";
 import SectionHeading from "./SectionHeading";
+import Loading from "./Loading";
+import { useDataProvider } from "./DataProvider";
 
 const variants = {
   hidden: { opacity: 0, y: 10 },
@@ -14,7 +13,7 @@ const variants = {
 };
 
 const Proposals = () => {
-  const { data, error } = useSWR([0], tokens.getApps);
+  const { proposals } = useDataProvider();
 
   return (
     <Container>
@@ -29,17 +28,16 @@ const Proposals = () => {
         }
       >
         <span className="mr-4">All Proposals </span>
-        {data && (
+        {proposals && (
           <span className="text-zinc-500 font-normal text-2xl shadow-sm">
-            {data.length} {data.length != 1 ? "proposals" : "proposal"}
+            {proposals.size} {proposals.size != 1 ? "proposals" : "proposal"}
           </span>
         )}
       </SectionHeading>
 
-      {data && (
+      {proposals ? (
         <motion.ul
           variants={{
-            hidden: {},
             show: {
               transition: {
                 staggerChildren: 0.05,
@@ -49,12 +47,14 @@ const Proposals = () => {
           initial="hidden"
           animate="show"
         >
-          {data.map((app) => (
-            <motion.li variants={variants} key={app.principal.toString()}>
+          {[...proposals].map(([id, app]) => (
+            <motion.li variants={variants} key={id}>
               <ProposalCard application={app} />
             </motion.li>
           ))}
         </motion.ul>
+      ) : (
+        <Loading />
       )}
     </Container>
   );
