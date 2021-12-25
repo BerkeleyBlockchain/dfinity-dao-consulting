@@ -3,13 +3,15 @@ import { Link, useParams } from "react-router-dom";
 import useSWR from "swr";
 import { tokens } from "../../declarations/tokens";
 import { Application } from "../../declarations/tokens/tokens.did";
+import Container from "./Container";
+import SectionHeading from "./SectionHeading";
 
 const Proposal = () => {
   const { principal } = useParams<"principal">();
   return (
-    <section>
-      <h1>Proposal for {principal}</h1>
-    </section>
+    <Container>
+      <SectionHeading>{principal}</SectionHeading>
+    </Container>
   );
 };
 

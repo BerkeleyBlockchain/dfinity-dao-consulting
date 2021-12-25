@@ -3,6 +3,7 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const FRONTEND_DIR = "frontend";
 const IS_DEVELOPMENT = process.env.NODE_ENV !== "production";
@@ -61,6 +62,7 @@ module.exports = {
   },
   output: {
     filename: "[id].bundle.js",
+    publicPath: "/",
     path: path.join(__dirname, "dist", FRONTEND_DIR),
   },
   module: {
@@ -70,6 +72,19 @@ module.exports = {
         test: /\.(js|ts|tsx|jsx)$/,
         exclude: /node_modules/,
         loader: "source-map-loader",
+      },
+      {
+        test: /\.css$/,
+        use: [
+          IS_DEVELOPMENT ? "style-loader" : MiniCssExtractPlugin.loader,
+          "css-loader",
+          "postcss-loader",
+        ],
+      },
+      {
+        test: /\.svg$/,
+        issuer: /\.[jt]sx?$/,
+        use: ["@svgr/webpack"],
       },
     ],
   },
@@ -86,22 +101,15 @@ module.exports = {
       template: path.join(__dirname, "src", FRONTEND_DIR, "src", "index.html"),
       cache: false,
     }),
-    new webpack.ProvidePlugin({
-      Buffer: [require.resolve("buffer/"), "Buffer"],
-    }),
     new webpack.EnvironmentPlugin(CANISTER_IDS),
+    ...(IS_DEVELOPMENT ? [] : [new MiniCssExtractPlugin()]),
   ],
   // proxy /api to port 8000 during development
   devServer: {
     proxy: {
-      "/api": {
-        target: DEV_PROXY,
-        // changeOrigin: true,
-        // pathRewrite: {
-        //   "^/api": "/api",
-        // },
-      },
+      "/api": DEV_PROXY,
     },
+    historyApiFallback: true,
     static: path.join(__dirname, "src", FRONTEND_DIR, "assets"),
   },
 };

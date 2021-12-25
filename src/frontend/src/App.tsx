@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Layout from "./Layout";
+import NewProposal from "./NewProposal";
 import Proposal from "./Proposal";
 import Proposals from "./Proposals";
 
@@ -11,6 +12,7 @@ const App = () => (
       <Route index element={<Proposals />} />
       <Route path="proposals" element={<Proposals />} />
       <Route path="proposal/:principal" element={<Proposal />} />
+      <Route path="proposal/new" element={<NewProposal />} />
     </Route>
   </Routes>
 );
