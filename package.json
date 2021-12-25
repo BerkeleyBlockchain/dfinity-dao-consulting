@@ -13,10 +13,11 @@
   "devDependencies": {
     "@dfinity/agent": "^0.10.2",
     "@dfinity/principal": "^0.10.2",
+    "@fleekhq/plug-inpage-provider": "^1.0.1",
     "@svgr/webpack": "^6.1.2",
+    "@types/markdown-it": "^12.2.3",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
-    "@types/markdown-it": "^12.2.3",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.5.1",
     "html-webpack-plugin": "5.3.1",

@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import useSWR from "swr";
-import { tokens } from "../../declarations/tokens";
-import { Application } from "../../declarations/tokens/tokens.did";
 import Container from "./Container";
 import { useDataProvider } from "./DataProvider";
 import Markdown from "./Markdown";
@@ -21,6 +18,9 @@ const Proposal = () => {
 
   return (
     <Container>
+      <Link to="/proposals" className="text-zinc-500 font-medium font-mono">
+        ← All proposals
+      </Link>
       <SectionHeading>{proposal.proposal.name}</SectionHeading>
       <div>
         <Markdown text={proposal.proposal.description} />

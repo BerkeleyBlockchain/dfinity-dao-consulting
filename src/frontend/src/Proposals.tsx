@@ -20,7 +20,8 @@ const Proposals = () => {
       <SectionHeading
         attachment={
           <Link
-            className="transition bg-amber-500 hover:bg-amber-600 px-5 py-2 text-sm rounded-md font-semibold text-white"
+            className="transition bg-amber-500 hover:bg-amber-600 px-5 py-2 shadow
+            text-sm rounded-md font-semibold text-white "
             to="/proposal/new"
           >
             New Proposal
@@ -29,7 +30,7 @@ const Proposals = () => {
       >
         <span className="mr-4">All Proposals </span>
         {proposals && (
-          <span className="text-zinc-500 font-normal text-2xl shadow-sm">
+          <span className="text-zinc-500 font-normal text-2xl">
             {proposals.size} {proposals.size != 1 ? "proposals" : "proposal"}
           </span>
         )}
