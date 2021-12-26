@@ -9,8 +9,12 @@ const PlugConnect = () => {
 
   return (
     <button
-      className={`group p-[2px] text-sm rounded-md font-medium shadow ${
-        PLUG_SUPPORTED ? "" : "disabled:opacity-80"
+      className={`transition group p-[2px] text-sm rounded-md font-medium shadow ${
+        PLUG_SUPPORTED
+          ? !isConnected && !isLoading
+            ? "hover:scale-105 active:scale-95"
+            : ""
+          : "disabled:opacity-80"
       }`}
       style={{
         background:

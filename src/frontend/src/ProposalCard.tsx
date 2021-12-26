@@ -9,7 +9,7 @@ type Props = {
 const ProposalCard = ({ application }: Props) => (
   <Link
     className="flex group items-center rounded-xl py-4 px-6 mx-[-1.5rem] mb-4 shadow-none
-      hover:shadow-lg 
+      hover:shadow-lg
       transition hover:bg-zinc-800"
     to={`/proposal/${application.principal}`}
   >
