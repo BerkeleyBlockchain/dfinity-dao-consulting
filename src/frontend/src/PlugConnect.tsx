@@ -3,6 +3,7 @@ import { PLUG_SUPPORTED, useIdentity } from "./Identity";
 import PlugLogo from "./svg/Plug.svg";
 import DfinityLogo from "./svg/Dfinity.svg";
 import Loader from "./svg/puff-loader.svg";
+import { Principal } from "@dfinity/principal";
 
 const PlugConnect = () => {
   const { identity, isLoading, isConnected, connect } = useIdentity();
@@ -40,8 +41,8 @@ const PlugConnect = () => {
           </>
         ) : isConnected ? (
           <>
-            <DfinityLogo className="inline h-4 w-auto mr-2" />{" "}
-            {identity.balances.get("ICP")?.amount || 0} ICP
+            <PlugLogo className="inline h-4 w-auto mr-2" />
+            {identity.principal.slice(0, 5)}
           </>
         ) : (
           <>

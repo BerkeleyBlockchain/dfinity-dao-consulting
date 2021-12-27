@@ -105,33 +105,28 @@ fn add_record(
     index
 }
 
+static INITIAL_SUPPLY: u64 = 1_000_000;
+
 #[init]
 #[candid_method(init)]
-fn init(
-    logo: String,
-    name: String,
-    symbol: String,
-    decimals: u8,
-    total_supply: u64,
-    owner: Principal,
-    fee: u64,
-) {
+fn init() {
+    let owner = Principal::from_text("r7inp-6aaaa-aaaaa-aaabq-cai").unwrap();
     let metadata = ic::get_mut::<Metadata>();
-    metadata.logo = logo;
-    metadata.name = name;
-    metadata.symbol = symbol;
-    metadata.decimals = decimals;
-    metadata.total_supply = total_supply;
+    metadata.logo = "".to_string();
+    metadata.name = "Dfinity Grant DAO Token".to_string();
+    metadata.symbol = "DGDT".to_string();
+    metadata.decimals = 1;
+    metadata.total_supply = INITIAL_SUPPLY;
     metadata.owner = owner;
-    metadata.fee = fee;
+    metadata.fee = 0;
     let balances = ic::get_mut::<Balances>();
-    balances.insert(owner, total_supply);
+    balances.insert(owner, INITIAL_SUPPLY);
     let _ = add_record(
         Some(owner),
         Operation::Mint,
         Principal::from_text("aaaaa-aa").unwrap(),
-        owner,
-        total_supply,
+        Principal::from_text("r7inp-6aaaa-aaaaa-aaabq-cai").unwrap(),
+        INITIAL_SUPPLY,
         0,
         ic::time(),
     );
@@ -585,15 +580,7 @@ mod tests {
     use assert_panic::assert_panic;
 
     fn initialize_tests() {
-      init(
-        String::from("logo"),
-        String::from("token"),
-        String::from("TOKEN"),
-        2,
-        1_000,
-        alice(),
-        1,
-      );
+      init();
     }
 
     #[test]

@@ -1,5 +1,5 @@
 // mod token;
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 use ic_kit::{ic, Principal};
 
 // TODO: update since time is returned in nanoseconds
@@ -23,6 +23,11 @@ struct Transaction {
     return_amount: f64
 }
 
+pub fn get_source_token_principal() -> Principal {
+    // TODO: change 
+    return Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap()
+}
+
 pub fn stake(
     caller: Principal,
     amount: u64,
@@ -30,6 +35,8 @@ pub fn stake(
     locktime: u64,
     timestamp: u64,
 ) {
+    
+
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
     

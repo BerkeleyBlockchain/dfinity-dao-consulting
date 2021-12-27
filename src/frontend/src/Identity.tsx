@@ -1,4 +1,4 @@
-import { ActorSubclass } from "@dfinity/agent";
+import { ActorSubclass, Agent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import React, {
   createContext,
@@ -12,27 +12,43 @@ import React, {
 } from "react";
 
 import * as tokensCanister from "../../declarations/tokens";
-import { _SERVICE } from "../../declarations/tokens/tokens.did";
+import { _SERVICE as TOKENS_SERVICE } from "../../declarations/tokens/tokens.did";
+
+import * as mintingCanister from "../../declarations/minting";
+import { _SERVICE as MINTING_SERVICE } from "../../declarations/minting/minting.did";
+
+import { idlFactory as dip20idlFactory } from "../../external/dip20";
+import { _SERVICE as DIP20_SERVICE } from "../../external/dip20.did";
+
+const IS_DEV_HOST = process.env.NODE_ENV !== "production";
+
+export const WICP_CANISTER_ID: string = "utozz-siaaa-aaaam-qaaxq-cai";
+
+export const WICP_CANISTER: Principal = Principal.fromText(WICP_CANISTER_ID);
+export const TOKENS_CANISTER: Principal = Principal.fromText(
+  tokensCanister.canisterId
+);
 
 // Override the host. (if overriden, will use a custom agent that is insecure).
 const AGENT_PARAMS = {
-  whitelist: [tokensCanister.canisterId],
-  host: process.env.NODE_ENV === "production" ? undefined : location.origin,
+  whitelist: [
+    tokensCanister.canisterId,
+    mintingCanister.canisterId,
+    WICP_CANISTER_ID,
+  ],
+  host: IS_DEV_HOST ? location.origin : undefined,
 };
 
-type Balance = {
-  amount: number;
-  canisterId: string | null;
-  name: string;
-  symbol: string;
-};
-
-export type TokensActor = ActorSubclass<_SERVICE>;
+export type TokensActor = ActorSubclass<TOKENS_SERVICE>;
+export type MintingActor = ActorSubclass<MINTING_SERVICE>;
+export type DIP20Actor = ActorSubclass<MINTING_SERVICE>;
 
 type Identity = {
   principal: string;
-  balances: Map<string, Balance>;
-  actor: TokensActor;
+  balance: bigint;
+  tokens: TokensActor;
+  minting: MintingActor;
+  wipc: DIP20Actor;
 } | null;
 
 type IdentityContextData = {
@@ -52,28 +68,33 @@ export const IdentityProvider: FC = ({ children }) => {
   const loadIdentityData = useCallback(async () => {
     setIsLoading(true);
 
-    const [principal, balances, actor] = await Promise.all<
-      [Principal, Balance[], TokensActor]
+    const [principal, tokens, minting, wipc] = await Promise.all<
+      [Principal, TokensActor, MintingActor, DIP20Actor]
     >([
       window.ic.plug.getPrincipal(),
-      window.ic.plug.requestBalance(),
       window.ic.plug.createActor({
         canisterId: tokensCanister.canisterId,
         interfaceFactory: tokensCanister.idlFactory,
       }),
+      window.ic.plug.createActor({
+        canisterId: mintingCanister.canisterId,
+        interfaceFactory: mintingCanister.idlFactory,
+      }),
+      window.ic.plug.createActor({
+        canisterId: WICP_CANISTER_ID,
+        interfaceFactory: dip20idlFactory,
+      }),
     ]);
 
-    // Convert balances => map
-    const balanceMap = new Map<string, Balance>(
-      balances.map((balance: Balance) => [balance.symbol, balance])
-    );
-
-    console.log(actor);
+    // Get metadata.
+    const userBalance = await minting.balanceOf(principal);
 
     setIdentity({
       principal: principal.toString(),
-      balances: balanceMap,
-      actor: actor,
+      balance: userBalance,
+      tokens,
+      minting,
+      wipc,
     });
     setIsLoading(false);
   }, [setIdentity]);
@@ -92,6 +113,7 @@ export const IdentityProvider: FC = ({ children }) => {
         setIdentity(null);
       } else {
         await window.ic.plug.createAgent(AGENT_PARAMS);
+        if (IS_DEV_HOST) await window.ic.plug.agent.fetchRootKey();
         await loadIdentityData();
       }
     }
