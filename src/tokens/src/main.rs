@@ -39,6 +39,7 @@ pub fn get_apps() -> Vec<&'static voting::Application> {
 pub fn join_as_voter(
     amount: u64,
     locktime: u64,
+
 ) {
     static STAKING_FEE: u64 = 0; // No staking fee for now
     staking::stake(ic::caller(), amount, STAKING_FEE, locktime, ic::time());
@@ -74,12 +75,12 @@ pub fn join_as_voter(
 const VOTE_EXPONENT: u32 = 2;
 // Prints out something idk what this does.
 #[query]
-fn getNumVotes(icpAdded: u32, currVotes: u32) {
+fn getNumVotes(icpAdded: u32, currVotes: u32) -> String {
     //new votes: currvotes ^ vote_exp + icpAdded
     let num_icp = currVotes.pow(VOTE_EXPONENT) + icpAdded;
     let conv_ratio = 1 / VOTE_EXPONENT;
     let num_votes = (num_icp as f64).powf(conv_ratio as f64);
-    ic_cdk::print(num_votes.to_string());
+    num_votes.to_string()
 }
 
 // cast first vote
@@ -99,7 +100,6 @@ fn castSecondVote(
     voting::secondVote(ic::caller(), votes);
 }
 
-// delegate voting tokens to others
 // setting grant sizes
 fn grantSizes(
     sizes:LinkedList<u64>
