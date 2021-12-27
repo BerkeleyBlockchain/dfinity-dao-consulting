@@ -57,6 +57,16 @@ pub fn stake(
     tx_map.insert(locktime + timestamp, take_tx);
 }
 
+pub fn get_stakers() -> LinkedList<Principal> {
+    let staker_map = ic::get::<Stakers>();
+    let stakers = LinkedList<Principal> = LinkedList::new();
+    for (&key, value) in staker_map.into_iter() {
+        stakers.push_back(&key);
+    }
+    stakers
+
+}
+
 
 fn removeUnlocked(
     caller: Principal,
@@ -187,3 +197,5 @@ fn calculateReturnLocked(
 //     }
 //     reward_amount
 // }
+
+// delegate voting tokens to others
