@@ -1,16 +1,17 @@
 // mod token;
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, collections::LinkedList, str::FromStr};
 use ic_kit::{ic, Principal};
-
+//https://github.com/dfinity/examples/tree/master/rust/tokens_transfer
 // TODO: update since time is returned in nanoseconds
 //assuming time is in seconds
 
 static REWARD_CONST: f64 = 1209600.0;
 static APY: f64 = 0.08;
 static TIME_STEPS_PER_YEAR: u64 = 31536000;
+static FIRST_VOTE_COST: u64 = 10; // in ICP
 
-type Stakers = HashMap<Principal, u64>;
-type Unlocked = HashMap<Principal, u64>; // I think this should be an f64
+type Stakers = HashMap<Principal, f64>;
+type Unlocked = HashMap<Principal, f64>; // I think this should be an f64
 
 // This only allows 1 txn per second which may not be what we want. 
 // May be better to use BTreeSet<Transaction>
@@ -55,18 +56,26 @@ pub fn stake(
 
     // whas tx_list before, but changed since it was giving error
     tx_map.insert(locktime + timestamp, take_tx);
+
+    // add transfer function call
+
+    // transfer voting tokens (don't delete) and add proper error handling
+    let numVotes : u64 = calculateNumVoteTokens(amount);
+    ic::call(MINTING_CANISTER, "transfer", (caller, numVotes))
+        .await
+        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+
 }
 
 pub fn get_stakers() -> LinkedList<Principal> {
     let staker_map = ic::get::<Stakers>();
-    let stakers = LinkedList<Principal> = LinkedList::new();
+    let stakers = LinkedList::new();
     for (&key, value) in staker_map.into_iter() {
         stakers.push_back(&key);
     }
     stakers
 
 }
-
 
 fn removeUnlocked(
     caller: Principal,
@@ -115,7 +124,7 @@ fn unlockFunds(
         tx_map.retain(|&time, tx| {
             if time > timestamp {
                 // FIXME: u64 + f64 is sketchy.
-                new_unlock = new_unlock + (tx.return_amount as u64);
+                new_unlock = new_unlock + tx.return_amount;
                 false // Remove this transaction
             } else {
                 true
@@ -177,6 +186,19 @@ fn calculateReturnLocked(
 ) -> f64 {
     let num_years = (locktime as f64) / (TIME_STEPS_PER_YEAR as f64);
     num_years * APY * (amount as f64) + (amount as f64)
+}
+
+fn calculateNumVoteTokens(
+    staked: u64,
+) -> u64 {
+    // minimum amount is the same as the cost of one vote token
+    let cost : u64 = FIRST_VOTE_COST;
+    let votes : u64 = 0;
+    while staked >= cost {
+        staked -= cost;
+        votes += 1;
+    }
+    votes
 }
 
 // fn calculateReward(
