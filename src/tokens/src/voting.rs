@@ -78,7 +78,8 @@ pub fn setGrantSizes(
 // list of applications they've looked at 
 pub async fn firstVote(
     from: Principal,
-    metadata: HashMap<Principal, bool>
+    application: Principal,
+    decision: bool
 ) -> Result<(), String> {
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
@@ -87,22 +88,32 @@ pub async fn firstVote(
     let (balance,): (u64,) = ic::call(MINTING_CANISTER, "balanceOf", (from,))
         .await
         .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
-
-    // use dfinity's account as grantee
+    
+    // don't think we need this tbh, we shouldnt be using tokens on first vote
     ic::call(MINTING_CANISTER, "transfer", (from, BURN_ID, balance, ""))
         .await
         .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
 
     let results1 = ic::get_mut::<Results1>();
-    for (application, didVoteFor) in metadata.into_iter() {
-        // TODO: ensure an application for 'application' does exist.
+    // TODO: DEBUG THIS
+    if application in results1.keys() {
         let applicationVotes = results1.entry(application).or_insert(VoteStatus { yes: 0, no: 0 });
-        if didVoteFor {
+        if decision {
             applicationVotes.yes += 1;
         } else {
             applicationVotes.no += 1;
         }
     }
+
+    // for (application, didVoteFor) in metadata.into_iter() {
+    //     // TODO: ensure an application for 'application' does exist.
+    //     let applicationVotes = results1.entry(application).or_insert(VoteStatus { yes: 0, no: 0 });
+    //     if didVoteFor {
+    //         applicationVotes.yes += 1;
+    //     } else {
+    //         applicationVotes.no += 1;
+    //     }
+    // }
     Ok(())
 }
 
@@ -115,7 +126,16 @@ pub fn secondVote(
     //     Some(ranks) => { metadata; }
     //     None => None;
     // }
-    // what to do with token?
+    // transfer token 
+    // TODO: DEBUG
+    let count = vote2.size();
+    for applicant in vote2.into_iter() {
+        ic::call(MINTING_CANISTER, "transfer", (from, applicant, count, ""))
+        // .await
+        // .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+        count -= 1;
+
+    }
 }
 
 fn firstRoundWinners(

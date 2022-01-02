@@ -29,15 +29,13 @@ pub fn get_source_token_principal() -> Principal {
     return Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap()
 }
 
-pub fn stake(
+pub async fn stake(
     caller: Principal,
     amount: u64,
     fee: u64,
     locktime: u64,
     timestamp: u64,
 ) {
-    
-
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
     
@@ -54,16 +52,17 @@ pub fn stake(
         return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
     };
 
-    // whas tx_list before, but changed since it was giving error
+    // was tx_list before, but changed since it was giving error
     tx_map.insert(locktime + timestamp, take_tx);
 
     // add transfer function call
 
     // transfer voting tokens (don't delete) and add proper error handling
     let numVotes : u64 = calculateNumVoteTokens(amount);
-    ic::call(MINTING_CANISTER, "transfer", (caller, numVotes))
-        .await
-        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+    let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+    ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
+        // .await
+        // .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
 
 }
 
@@ -73,7 +72,7 @@ pub fn get_stakers() -> LinkedList<Principal> {
     for (&key, value) in staker_map.into_iter() {
         stakers.push_back(&key);
     }
-    stakers
+    &stakers
 
 }
 

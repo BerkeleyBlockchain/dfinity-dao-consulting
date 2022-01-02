@@ -86,9 +86,10 @@ fn getNumVotes(icpAdded: u32, currVotes: u32) -> String {
 // cast first vote
 #[update]
 fn castFirstVote(
-    votes: HashMap<Principal, bool>,
+    application,
+    decision
 ) {
-    voting::firstVote(ic::caller(), votes);
+    voting::firstVote(ic::caller(), application, decision);
 }
 
 // cast second vote
