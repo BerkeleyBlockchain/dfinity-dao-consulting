@@ -8,6 +8,7 @@ type Results1 = BTreeMap<Principal, VoteStatus>;
 type Results2 = BTreeMap<Principal, u64>;
 type Winners1 = LinkedList<Principal>;
 type GrantSizes = LinkedList<u64>;
+type VotingPeriods = LinkedList<Tuple>;
 
 type Vote2 = BTreeMap<Principal, LinkedList<Principal>>;
 
@@ -79,8 +80,16 @@ pub fn setGrantSizes(
 pub async fn firstVote(
     from: Principal,
     application: Principal,
-    decision: bool
+    decision: bool,
+    timestamp: u64
 ) -> Result<(), String> {
+    // check if in the right voting period
+    let voting_periods = ic::get::<VotingPeriods>;
+    // TODO: not sure how to deal with timestamps and debug
+    let current_period = voting_periods.val;
+    if (timestamp < current_period[0]) and (timestamp > current_period[1]) {
+        return
+    }
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
 
@@ -153,8 +162,15 @@ fn firstRoundWinners(
     }
 }
 
-// second vote winners function
-// fn secondVoteWinners()
+pub fn addVotingPeriod (
+    start: u64,
+    end: u64
+) {
+    // add start and end to list of tuples
+    let voting_periods = ic::get_mut::<VotingPeriods>;
+    // TODO: is this how you create a tuple in rust?
+    voting_periods.push_back((start, end));
+}
 
 // time lock
 // have a way of looking at how many voters there are 
