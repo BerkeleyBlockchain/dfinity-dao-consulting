@@ -1,6 +1,9 @@
 // mod token;
 use std::{collections::HashMap, collections::LinkedList, str::FromStr};
 use ic_kit::{ic, Principal};
+use sha2::{Sha256};
+use serde::{Serialize, Deserialize};
+use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, SubAccount, TransferArgs};
 //https://github.com/dfinity/examples/tree/master/rust/tokens_transfer
 // TODO: update since time is returned in nanoseconds
 //assuming time is in seconds
@@ -24,9 +27,85 @@ struct Transaction {
     return_amount: f64
 }
 
+
 pub fn get_source_token_principal() -> Principal {
     // TODO: change 
-    return Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap()
+    return Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+struct Invoice {
+    amount: u64,
+    encoded: Vec<u8>
+}
+
+impl AsRef<[u8]> for Invoice {
+    fn as_ref(&self) -> &[u8] {
+        &self.encoded
+    }
+}
+
+type ICP = record {
+    e8s : nat64;
+  };
+// STAKING: https://www.youtube.com/watch?v=Hm-NWwiUQZw&list=PLuhDt1vhGcrez-f3I0_hvbwGZHZzkZ7Ng&index=2&t=1s
+// NNS Ledger Canlista: https://k7gat-daaaa-aaaae-qaahq-cai.ic0.app/listing/nns-ledger-10244/ryjl3-tyaaa-aaaaa-aaaba-cai
+pub fn get_invoice(
+    amount: u64
+) {
+    let invoice = Invoice {
+        amount: amount
+    }
+    return invoice;
+}
+
+pub fn notify(
+    paid: Invoice,
+    block: u64
+) {
+    let LEDGER_CANISTER: Principal = Principal::from_str("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+    
+    let mut hasher = Sha256::new();
+    hasher.update(paid);
+    let hash = hasher.finalize();
+    let amt = ic:call(LEDGER_CANISTER, "account_balance", AccountIdentifier(ic::this(), hash));
+    if (amt != paid.amount) {
+        return false;
+    }
+
+    ic:call(LEDGER_CANISTER, "transfer", TransferArgs(to = ic::this(),
+                                                      fee = ICP(0.1),
+                                                      memo = Memo(0), 
+                                                      from_subaccount = SubAccount(hash))
+                                                      amount = paid.amount);
+
+    // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
+    let stakers = ic::get_mut::<Stakers>();
+    let transactions = ic::get_mut::<Transactions>();
+    
+    let current_stake = stakers.get(&caller).copied().unwrap_or(0);
+
+    stakers.insert(caller, amount + current_stake);
+
+    let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
+
+    let take_tx = Transaction {
+        amount: amount,
+        time: timestamp,
+        locktime: locktime,
+        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
+    };
+
+    // was tx_list before, but changed since it was giving error
+    tx_map.insert(locktime + timestamp, take_tx);
+
+    // add transfer function call
+
+    // transfer voting tokens (don't delete) and add proper error handling
+    let numVotes : u64 = calculateNumVoteTokens(amount);
+    let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+    ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
+    return true;
 }
 
 pub async fn stake(
