@@ -80,14 +80,14 @@ pub fn setGrantSizes(
 pub async fn firstVote(
     application: Principal,
     decision: bool,
-    timestamp: u64
+timestamp: u64
 ) -> Result<(), String> {
     // check if in the right voting period
     let from : Principal = ic::caller();
     let voting_periods = ic::get::<VotingPeriods>;
     // TODO: not sure how to deal with timestamps and debug
     let current_period = voting_periods.val;
-    if (timestamp < current_period[0]) and (timestamp > current_period[1]) {
+    if (timestamp < current_period[0]) && (timestamp > current_period[1]) {
         return Err("Not correct voting period".to_string());
     }
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
@@ -105,7 +105,7 @@ pub async fn firstVote(
 
     let results1 = ic::get_mut::<Results1>();
     // TODO: DEBUG THIS
-    if application in results1.keys() {
+    if results1.contains_key(&application) {
         let applicationVotes = results1.entry(application).or_insert(VoteStatus { yes: 0, no: 0 });
         if decision {
             applicationVotes.yes += 1;
@@ -123,7 +123,7 @@ pub async fn firstVote(
     //         applicationVotes.no += 1;
     //     }
     // }
-    Ok()
+    Ok(())
 }
 
 pub fn secondVote(

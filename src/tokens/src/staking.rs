@@ -3,7 +3,8 @@ use std::{collections::HashMap, collections::LinkedList, str::FromStr};
 use ic_kit::{ic, Principal};
 use sha2::{Sha256};
 use serde::{Serialize, Deserialize};
-use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, SubAccount, TransferArgs};
+use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs};
+use ic_cdk::api;
 //https://github.com/dfinity/examples/tree/master/rust/tokens_transfer
 // TODO: update since time is returned in nanoseconds
 //assuming time is in seconds
@@ -45,9 +46,9 @@ impl AsRef<[u8]> for Invoice {
     }
 }
 
-type ICP = record {
-    e8s : nat64;
-  };
+// type ICP = record {
+//     e8s : nat64;
+//   };
 // STAKING: https://www.youtube.com/watch?v=Hm-NWwiUQZw&list=PLuhDt1vhGcrez-f3I0_hvbwGZHZzkZ7Ng&index=2&t=1s
 // NNS Ledger Canlista: https://k7gat-daaaa-aaaae-qaahq-cai.ic0.app/listing/nns-ledger-10244/ryjl3-tyaaa-aaaaa-aaaba-cai
 pub fn get_invoice(
@@ -55,7 +56,7 @@ pub fn get_invoice(
 ) {
     let invoice = Invoice {
         amount: amount
-    }
+    };
     return invoice;
 }
 
@@ -68,15 +69,15 @@ pub fn notify(
     let mut hasher = Sha256::new();
     hasher.update(paid);
     let hash = hasher.finalize();
-    let amt = ic:call(LEDGER_CANISTER, "account_balance", AccountIdentifier(ic::this(), hash));
+    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier(api::id(), hash));
     if (amt != paid.amount) {
         return false;
     }
 
-    ic:call(LEDGER_CANISTER, "transfer", TransferArgs(to = ic::this(),
+    ic::call(LEDGER_CANISTER, "transfer", TransferArgs(to = api::id(),
                                                       fee = ICP(0.1),
                                                       memo = Memo(0), 
-                                                      from_subaccount = SubAccount(hash))
+                                                      from_subaccount = Subaccount(hash))
                                                       amount = paid.amount);
 
     // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
@@ -145,7 +146,7 @@ pub async fn stake(
 
 }
 
-pub fn get_stakers() -> LinkedList<Principal> {
+pub fn get_stakers() -> &LinkedList<Principal> {
     let staker_map = ic::get::<Stakers>();
     let stakers = LinkedList::new();
     for (&key, value) in staker_map.into_iter() {

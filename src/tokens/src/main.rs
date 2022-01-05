@@ -86,10 +86,10 @@ fn getNumVotes(icpAdded: u32, currVotes: u32) -> String {
 // cast first vote
 #[update]
 fn castFirstVote(
-    application,
-    decision
+    application: Principal,
+    decision: u64
 ) {
-    voting::firstVote(ic::caller(), application, decision);
+    voting::firstVote(application, decision);
 }
 
 // cast second vote
