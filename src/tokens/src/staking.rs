@@ -3,7 +3,7 @@ use std::{collections::HashMap, collections::LinkedList, str::FromStr};
 use ic_kit::{ic, Principal};
 use sha2::{Sha256};
 use serde::{Serialize, Deserialize};
-use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs};
+use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo, Tokens};
 use ic_cdk::api;
 //https://github.com/dfinity/examples/tree/master/rust/tokens_transfer
 // TODO: update since time is returned in nanoseconds
@@ -64,7 +64,7 @@ pub fn notify(
     paid: Invoice,
     block: u64
 ) {
-    let LEDGER_CANISTER: Principal = Principal::from_str("ryjl3-tyaaa-aaaaa-aaaba-cai").unwrap();
+    let LEDGER_CANISTER: Principal = ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
     
     let mut hasher = Sha256::new();
     hasher.update(paid);
@@ -73,12 +73,14 @@ pub fn notify(
     if (amt != paid.amount) {
         return false;
     }
-
-    ic::call(LEDGER_CANISTER, "transfer", TransferArgs(to = api::id(),
-                                                      fee = ICP(0.1),
-                                                      memo = Memo(0), 
-                                                      from_subaccount = Subaccount(hash))
-                                                      amount = paid.amount);
+    let transfer = TransferArgs {
+        memo: Memo(0),
+        amount: paid.amount,
+        fee: ic_ledger_types::DEFAULT_FEE,
+        from_subaccount: Subaccount(hash),
+        to: api::id()
+    };
+    ic::call(LEDGER_CANISTER, "transfer", transfer);
 
     // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
     let stakers = ic::get_mut::<Stakers>();
@@ -91,7 +93,7 @@ pub fn notify(
     let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
 
     let take_tx = Transaction {
-        amount: amount,
+        amount: paid.amount,
         time: timestamp,
         locktime: locktime,
         return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
