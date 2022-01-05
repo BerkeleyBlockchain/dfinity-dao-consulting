@@ -52,8 +52,8 @@ pub fn setGrantSizes(
     sizes: LinkedList<u64>
 ) {
     let grant_sizes = ic::get_mut::<GrantSizes>();
-    for value in sizes {
-        grant_sizes.push_back(value);
+    for value in sizes.iter_mut() {
+        grant_sizes.push_back(*value);
     }
 }
 
@@ -78,17 +78,17 @@ pub fn setGrantSizes(
 
 // list of applications they've looked at 
 pub async fn firstVote(
-    from: Principal,
     application: Principal,
     decision: bool,
     timestamp: u64
 ) -> Result<(), String> {
     // check if in the right voting period
+    let from : Principal = ic::caller();
     let voting_periods = ic::get::<VotingPeriods>;
     // TODO: not sure how to deal with timestamps and debug
     let current_period = voting_periods.val;
     if (timestamp < current_period[0]) and (timestamp > current_period[1]) {
-        return
+        return Err("Not correct voting period".to_string());
     }
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
@@ -123,7 +123,7 @@ pub async fn firstVote(
     //         applicationVotes.no += 1;
     //     }
     // }
-    Ok(())
+    Ok()
 }
 
 pub fn secondVote(
@@ -131,15 +131,17 @@ pub fn secondVote(
     metadata: LinkedList<Principal>
 ) {
     let vote2 = ic::get_mut::<Vote2>();
+    let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+    let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
     // match vote2.get(&from) {
     //     Some(ranks) => { metadata; }
     //     None => None;
     // }
     // transfer token 
     // TODO: DEBUG
-    let count = vote2.size();
+    let count = vote2.len();
     for applicant in vote2.into_iter() {
-        ic::call(MINTING_CANISTER, "transfer", (from, applicant, count, ""))
+        ic::call(MINTING_CANISTER, "transfer", (from, applicant, count, ""));
         // .await
         // .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
         count -= 1;
