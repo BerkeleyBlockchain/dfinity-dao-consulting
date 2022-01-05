@@ -6,6 +6,9 @@ use candid::candid_method;
 use ic_kit::{ic, Principal};
 use ic_kit::macros::*;
 use std::collections::LinkedList;
+use chrono::prelude::*;
+
+
 
 
 
@@ -89,7 +92,8 @@ fn castFirstVote(
     application: Principal,
     decision: u64
 ) {
-    voting::firstVote(ic::caller(), application, decision);
+    let utc: DateTime<Utc> = Utc::now()
+    voting::firstVote(ic::caller(), application, decision, utc.timestamp());
 }
 
 // cast second vote

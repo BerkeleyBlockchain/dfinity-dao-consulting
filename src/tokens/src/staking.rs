@@ -3,8 +3,9 @@ use std::{collections::HashMap, collections::LinkedList, str::FromStr};
 use ic_kit::{ic, Principal};
 use sha2::{Sha256};
 use serde::{Serialize, Deserialize};
-use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo};
+use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo, Timestamp};
 use ic_cdk::api;
+use chrono::prelude::*;
 //https://github.com/dfinity/examples/tree/master/rust/tokens_transfer
 // TODO: update since time is returned in nanoseconds
 //assuming time is in seconds
@@ -63,30 +64,33 @@ pub fn get_invoice(
 pub fn notify(
     paid: Invoice,
     block: u64
-) {
+) -> Result<(), String> {
     let LEDGER_CANISTER: Principal = ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
     
     let mut hasher = Sha256::new();
     hasher.update(paid);
     let hash = hasher.finalize();
-    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash));
+    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash))?;
     if (amt != paid.amount) {
-        return false;
+        return Err("Canister subaccount did not receive invoice amount.".to_string());
     }
-    let transfer = TransferArgs {
+    let utc: DateTime<Utc> = Utc::now();
+    let seconds: u64 = utc.timestamp().unsigned_abs();
+    let base: u64 = 10;
+    let nanoseconds: u64 = seconds * base.pow(9);
+    ic::call(LEDGER_CANISTER, "transfer", TransferArgs( 
         memo: Memo(0),
         amount: paid.amount,
         fee: ic_ledger_types::DEFAULT_FEE,
         from_subaccount: Subaccount(hash),
-        to: api::id()
-    };
-    ic::call(LEDGER_CANISTER, "transfer", transfer);
+        to: AccountIdentifier(api::id(), ic_ledger_types::DEFAULT_SUBACCOUNT),
+        created_at_time: Timestamp(nanoseconds)));
 
     // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
     
-    let current_stake = stakers.get(&caller).copied().unwrap_or(0);
+    let current_stake = stakers.get(&caller).copied().unwrap_or(0.0);
 
     stakers.insert(caller, amount + current_stake);
 
@@ -96,7 +100,7 @@ pub fn notify(
         amount: paid.amount,
         time: timestamp,
         locktime: locktime,
-        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, paid.mount)
+        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, paid.amount)
     };
 
     // was tx_list before, but changed since it was giving error
@@ -108,7 +112,7 @@ pub fn notify(
     let numVotes : u64 = calculateNumVoteTokens(paid.amount);
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
-    return true;
+    Ok(());
 }
 
 pub async fn stake(
@@ -148,19 +152,19 @@ pub async fn stake(
 
 }
 
-pub fn get_stakers() -> &LinkedList<Principal> {
-    let staker_map = ic::get::<Stakers>();
-    let stakers = LinkedList::new();
-    for (&key, value) in staker_map.into_iter() {
-        stakers.push_back(&key);
-    }
-    &stakers
+// pub fn get_stakers() -> &LinkedList<Principal> {
+//     let staker_map = ic::get::<Stakers>();
+//     let stakers = LinkedList::new();
+//     for (&key, value) in staker_map.into_iter() {
+//         stakers.push_back(&key);
+//     }
+//     &stakers
 
-}
+// }
 
 fn removeUnlocked(
     caller: Principal,
-    amount: u64,
+    amount: f64,
     fee: u64,
     timestamp: u64
 ) -> bool {
@@ -181,11 +185,11 @@ fn removeUnlockedAll(
     caller: Principal,
     fee: u64,
     timestamp: u64,
-) -> u64 {
+) -> f64 {
     unlockFunds(caller, fee, timestamp);
     let unlock_amt = getUnlockedAmount(caller, fee, timestamp);
     let unlocked = ic::get_mut::<Unlocked>();
-    unlocked.insert(caller, 0);
+    unlocked.insert(caller, 0.0);
     unlock_amt
 }
 
@@ -199,7 +203,7 @@ fn unlockFunds(
     let unlocked = ic::get_mut::<Unlocked>();
 
     // TODO: is this right? Should the unlocked default to zero
-    let mut new_unlock = unlocked.get(&caller).copied().unwrap_or(0);
+    let mut new_unlock = unlocked.get(&caller).copied().unwrap_or(0.0);
 
     if let Some(tx_map) = transactions.get_mut(&caller) {
         tx_map.retain(|&time, tx| {
@@ -220,7 +224,7 @@ fn getUnlockedAmount(
     caller: Principal,
     fee: u64,
     timestamp: u64,
-) -> u64 {
+) -> f64 {
     let unlocked = ic::get_mut::<Unlocked>();
     *unlocked.get(&caller).unwrap()
 }

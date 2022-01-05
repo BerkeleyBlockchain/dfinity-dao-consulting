@@ -81,7 +81,7 @@ pub async fn firstVote(
     from: Principal,
     application: Principal,
     decision: bool,
-timestamp: u64
+    timestamp: i64
 ) -> Result<(), String> {
     // check if in the right voting period
     let from : Principal = ic::caller();
