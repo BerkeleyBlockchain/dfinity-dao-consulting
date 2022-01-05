@@ -89,7 +89,7 @@ fn castFirstVote(
     application: Principal,
     decision: u64
 ) {
-    voting::firstVote(application, decision);
+    voting::firstVote(ic::caller(), application, decision);
 }
 
 // cast second vote

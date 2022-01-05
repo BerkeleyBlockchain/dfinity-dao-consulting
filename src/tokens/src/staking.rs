@@ -3,7 +3,7 @@ use std::{collections::HashMap, collections::LinkedList, str::FromStr};
 use ic_kit::{ic, Principal};
 use sha2::{Sha256};
 use serde::{Serialize, Deserialize};
-use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo, Tokens};
+use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo};
 use ic_cdk::api;
 //https://github.com/dfinity/examples/tree/master/rust/tokens_transfer
 // TODO: update since time is returned in nanoseconds
@@ -69,7 +69,7 @@ pub fn notify(
     let mut hasher = Sha256::new();
     hasher.update(paid);
     let hash = hasher.finalize();
-    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier(api::id(), hash));
+    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash));
     if (amt != paid.amount) {
         return false;
     }
@@ -96,7 +96,7 @@ pub fn notify(
         amount: paid.amount,
         time: timestamp,
         locktime: locktime,
-        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
+        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, paid.mount)
     };
 
     // was tx_list before, but changed since it was giving error
@@ -105,7 +105,7 @@ pub fn notify(
     // add transfer function call
 
     // transfer voting tokens (don't delete) and add proper error handling
-    let numVotes : u64 = calculateNumVoteTokens(amount);
+    let numVotes : u64 = calculateNumVoteTokens(paid.amount);
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
     return true;

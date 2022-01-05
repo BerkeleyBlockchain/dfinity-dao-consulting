@@ -78,6 +78,7 @@ pub fn setGrantSizes(
 
 // list of applications they've looked at 
 pub async fn firstVote(
+    from: Principal,
     application: Principal,
     decision: bool,
 timestamp: u64
