@@ -6,8 +6,7 @@ use candid::candid_method;
 use ic_kit::{ic, Principal};
 use ic_kit::macros::*;
 use std::collections::LinkedList;
-
-
+use chrono::prelude::*;
 
 // Submits a grant application for a user
 #[update(name = "submitApp")]
@@ -42,7 +41,7 @@ pub fn join_as_voter(
 
 ) {
     static STAKING_FEE: u64 = 0; // No staking fee for now
-    staking::stake(ic::caller(), amount, STAKING_FEE, locktime, ic::time());
+    // staking::stake(ic::caller(), amount, STAKING_FEE, locktime, ic::time());
 }
 
 // create vote tokens, everytime local network is spun up
@@ -86,22 +85,24 @@ fn getNumVotes(icpAdded: u32, currVotes: u32) -> String {
 // cast first vote
 #[update]
 fn castFirstVote(
-    application,
-    decision
+    application: Principal,
+    decision: bool
 ) {
-    voting::firstVote(ic::caller(), application, decision);
+    let utc: DateTime<Utc> = Utc::now();
+    voting::firstVote(ic::caller(), application, decision, utc.timestamp());
 }
 
 // cast second vote
 // might need to edit this for multiple grant sizes 
 #[update]
 fn castSecondVote(
-    votes: LinkedList<Principal>
+    vote: Principal
 ) {
-    voting::secondVote(ic::caller(), votes);
+    voting::secondVoteAdd(ic::caller(), vote);
 }
 
 // setting grant sizes
+#[update]
 fn grantSizes(
     sizes:LinkedList<u64>
 ) {
