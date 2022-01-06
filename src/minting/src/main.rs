@@ -380,14 +380,14 @@ fn owner() -> Principal {
     metadata.owner
 }
 
-#[query(name = "getMetadta")]
-#[candid_method(query, rename = "getMetadta")]
+#[query(name = "getMetadata")]
+#[candid_method(query, rename = "getMetadata")]
 fn get_metadata() -> Metadata {
     ic::get::<Metadata>().clone()
 }
 
 #[update(name = "setMetadata")]
-#[candid_method(query, rename = "setMetadta")]
+#[candid_method(query, rename = "setMetadata")]
 fn set_metadata(
     logo: String,
     name: String,

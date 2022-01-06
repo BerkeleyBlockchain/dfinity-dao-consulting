@@ -39,6 +39,7 @@ export const idlFactory = ({ IDL }) => {
     'amount' : IDL.Nat64,
   });
   return IDL.Service({
+    'addTotalSupply' : IDL.Func([IDL.Nat64], [IDL.Nat64], ['query']),
     'allowance' : IDL.Func(
         [IDL.Principal, IDL.Principal],
         [IDL.Nat64],
@@ -85,16 +86,17 @@ export const idlFactory = ({ IDL }) => {
     'setLogo' : IDL.Func([IDL.Text], [], []),
     'setMetadata' : IDL.Func(
         [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Nat8,
           IDL.Nat64,
           IDL.Principal,
-          IDL.Principal,
-          IDL.Text,
-          IDL.Text,
           IDL.Nat64,
-          IDL.Text,
+          IDL.Principal,
         ],
         [],
-        [],
+        ['query'],
       ),
     'setOwner' : IDL.Func([IDL.Principal], [], []),
     'symbol' : IDL.Func([], [IDL.Text], ['query']),
@@ -107,14 +109,4 @@ export const idlFactory = ({ IDL }) => {
       ),
   });
 };
-export const init = ({ IDL }) => {
-  return [
-    IDL.Text,
-    IDL.Text,
-    IDL.Text,
-    IDL.Nat8,
-    IDL.Nat64,
-    IDL.Principal,
-    IDL.Nat64,
-  ];
-};
+export const init = ({ IDL }) => { return []; };

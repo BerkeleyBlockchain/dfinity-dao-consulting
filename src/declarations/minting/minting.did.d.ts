@@ -36,6 +36,7 @@ export interface TokenInfo {
 export type TxError = { 'InsufficientAllowance' : null } |
   { 'InsufficientBalance' : null };
 export interface _SERVICE {
+  'addTotalSupply' : (arg_0: bigint) => Promise<bigint>,
   'allowance' : (arg_0: Principal, arg_1: Principal) => Promise<bigint>,
   'approve' : (arg_0: Principal, arg_1: bigint) => Promise<Result>,
   'balanceOf' : (arg_0: Principal) => Promise<bigint>,
@@ -67,13 +68,14 @@ export interface _SERVICE {
   'setFeeTo' : (arg_0: Principal) => Promise<undefined>,
   'setLogo' : (arg_0: string) => Promise<undefined>,
   'setMetadata' : (
-      arg_0: bigint,
-      arg_1: Principal,
-      arg_2: Principal,
-      arg_3: string,
-      arg_4: string,
-      arg_5: bigint,
-      arg_6: string,
+      arg_0: string,
+      arg_1: string,
+      arg_2: string,
+      arg_3: number,
+      arg_4: bigint,
+      arg_5: Principal,
+      arg_6: bigint,
+      arg_7: Principal,
     ) => Promise<undefined>,
   'setOwner' : (arg_0: Principal) => Promise<undefined>,
   'symbol' : () => Promise<string>,

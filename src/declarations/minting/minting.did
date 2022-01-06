@@ -29,7 +29,8 @@ type TokenInfo = record {
   cycles : nat64;
 };
 type TxError = variant { InsufficientAllowance; InsufficientBalance };
-service : (text, text, text, nat8, nat64, principal, nat64) -> {
+service : () -> {
+  addTotalSupply : (nat64) -> (nat64) query;
   allowance : (principal, principal) -> (nat64) query;
   approve : (principal, nat64) -> (Result);
   balanceOf : (principal) -> (nat64) query;
@@ -38,7 +39,6 @@ service : (text, text, text, nat8, nat64, principal, nat64) -> {
   getHolders : (nat64, nat64) -> (vec record { principal; nat64 }) query;
   getLogo : () -> (text) query;
   getMetadata : () -> (Metadata) query;
-  setMetadata : (nat64, principal, principal, text, text, nat64, text) -> ();
   getTokenInfo : () -> (TokenInfo) query;
   getTransaction : (nat64) -> (OpRecord) query;
   getTransactions : (nat64, nat64) -> (vec OpRecord) query;
@@ -51,6 +51,16 @@ service : (text, text, text, nat8, nat64, principal, nat64) -> {
   setFee : (nat64) -> ();
   setFeeTo : (principal) -> ();
   setLogo : (text) -> ();
+  setMetadata : (
+      text,
+      text,
+      text,
+      nat8,
+      nat64,
+      principal,
+      nat64,
+      principal,
+    ) -> () query;
   setOwner : (principal) -> ();
   symbol : () -> (text) query;
   totalSupply : () -> (nat64) query;
