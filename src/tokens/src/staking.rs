@@ -56,7 +56,8 @@ pub fn get_invoice(
     amount: u64
 ) -> Invoice {
     let invoice = Invoice {
-        amount: amount
+        amount: amount,
+        encoded:  Vec::new()
     };
     return invoice;
 }

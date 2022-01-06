@@ -58,32 +58,27 @@ pub fn setGrantSizes(
     }
 }
 
-// fn secondVoteScores() {
-//     let vote2 = ic::get::<Vote2>();
-//     let count = 0;
-//     for (key, value) in vote2.into_iter() {
-//         let iter_ranked = value.iter();
-//         count = value.len(); // depends on how many they ranked
-//         let results2 = ic::get_mut::<Results2>();
-//         while iter_ranked != None {
-//             match results2.get(iter_ranked) {
-//                 Some(votes) => votes + count,
-//                 None => 0,
-//             }
-//             iter_ranked = iter_ranked.next();
-//             count = count - 1;
-//         }
-//     }
-    
-// }
+fn secondVoteScores() {
+    let vote2 = ic::get::<Vote2>();
+    let results2 = ic::get_mut::<Results2>();
+    let count : u64 = 0;
+    for (key, value) in vote2.into_iter() {
+        count = value.len() as u64; // depends on how many they ranked
+       for applicant in value.into_iter() {
+            if let Some(x) = results2.get_mut(applicant) {
+                *x += count;
+            }
+            count = count - 1;
+       }
+    }
+}
 
-// list of applications they've looked at 
 pub async fn firstVote(
     from: Principal,
     application: Principal,
     decision: bool,
     timestamp: i64
-) -> Result<(), String> {
+) {
     // check if in the right voting period
     let from : Principal = ic::caller();
     let voting_periods = ic::get::<VotingPeriods>();
@@ -92,21 +87,7 @@ pub async fn firstVote(
     // if (timestamp < current_period[0]) && (timestamp > current_period[1]) {
     //     return Err("Not correct voting period".to_string());
     // }
-    let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
-    let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
-
-    // TODO: proper error handling
-    let (balance,): (u64,) = ic::call(MINTING_CANISTER, "balanceOf", (from,))
-        .await
-        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
-    
-    // don't think we need this tbh, we shouldnt be using tokens on first vote
-    ic::call(MINTING_CANISTER, "transfer", (from, BURN_ID, balance, ""))
-        .await
-        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
-
     let results1 = ic::get_mut::<Results1>();
-    // TODO: DEBUG THIS
     if results1.contains_key(&application) {
         let applicationVotes = results1.entry(application).or_insert(VoteStatus { yes: 0, no: 0 });
         if decision {
@@ -125,28 +106,32 @@ pub async fn firstVote(
     //         applicationVotes.no += 1;
     //     }
     // }
-    Ok(())
 }
 
-pub async fn secondVote(
+pub async fn secondVoteAdd(
     from: Principal,
-    metadata: LinkedList<Principal>
-) -> () {
+    applicant: Principal
+) -> Result<(), String> {
     let vote2 = ic::get_mut::<Vote2>();
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
-    // match vote2.get(&from) {
-    //     Some(ranks) => { metadata; }
-    //     None => None;
-    // }
-    // transfer token 
-    // TODO: DEBUG
-    let count = vote2.len();
-    for applicant in vote2.into_iter() {
-        ic::call(MINTING_CANISTER, "transfer", (from, applicant, count, ""))
-        .await.map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
-        count -= 1;
+    
+    if let Some(x) = vote2.get_mut(&from) {
+        x.push_back(applicant);
+    }
 
+    // TODO: proper error handling
+    let (balance,): (u64,) = ic::call(MINTING_CANISTER, "balanceOf", (from,))
+        .await
+        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+    if balance > 0 {
+        ic::call(MINTING_CANISTER, "transfer", (from, BURN_ID, 1, ""))
+        .await
+        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+        Ok(())
+    } else {
+        println!("You do not have enough votes");
+        Ok(())
     }
 }
 
@@ -176,8 +161,3 @@ pub fn addVotingPeriod (
     vec.push(end);
     voting_periods.push_back(vec);
 }
-
-// time lock
-// have a way of looking at how many voters there are 
-// have a way at looking at grant sizes
-// need to rank second vote according to grant sizes
