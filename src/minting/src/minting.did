@@ -1,69 +1,165 @@
-type Metadata = record {
-  fee : nat64;
-  decimals : nat8;
-  fee_to : principal;
-  owner : principal;
-  logo : text;
-  name : text;
-  total_supply : nat64;
-  symbol : text;
-};
-type OpRecord = record {
-  op : Operation;
-  to : principal;
-  fee : nat64;
-  from : principal;
-  timestamp : nat64;
-  caller : opt principal;
-  index : nat64;
-  amount : nat64;
-};
-type Operation = variant { Approve; Mint; Transfer; TransferFrom };
-type Result = variant { Ok : nat64; Err : TxError };
-type TokenInfo = record {
-  deploy_time : nat64;
-  holder_number : nat64;
-  fee_to : principal;
-  history_size : nat64;
-  metadata : Metadata;
-  cycles : nat64;
-};
-type TxError = variant { InsufficientAllowance; InsufficientBalance };
-service : () -> {
-  addTotalSupply : (nat64) -> (nat64) query;
-  allowance : (principal, principal) -> (nat64) query;
-  approve : (principal, nat64) -> (Result);
-  balanceOf : (principal) -> (nat64) query;
-  decimals : () -> (nat8) query;
-  getAllowanceSize : () -> (nat64) query;
-  getHolders : (nat64, nat64) -> (vec record { principal; nat64 }) query;
-  getLogo : () -> (text) query;
-  getMetadta : () -> (Metadata) query;
-  getTokenInfo : () -> (TokenInfo) query;
-  getTransaction : (nat64) -> (OpRecord) query;
-  getTransactions : (nat64, nat64) -> (vec OpRecord) query;
-  getUserApprovals : (principal) -> (vec record { principal; nat64 }) query;
-  getUserTransactionAmount : (principal) -> (nat64) query;
-  getUserTransactions : (principal, nat64, nat64) -> (vec OpRecord) query;
-  historySize : () -> (nat64) query;
-  name : () -> (text) query;
-  owner : () -> (principal) query;
-  setFee : (nat64) -> ();
-  setFeeTo : (principal) -> ();
-  setLogo : (text) -> ();
-  setMetadta : (
-      text,
-      text,
-      text,
-      nat8,
-      nat64,
-      principal,
-      nat64,
-      principal,
-    ) -> () query;
-  setOwner : (principal) -> ();
-  symbol : () -> (text) query;
-  totalSupply : () -> (nat64) query;
-  transfer : (principal, nat64) -> (Result);
-  transferFrom : (principal, principal, nat64) -> (Result);
+// This is an experimental feature to generate Rust binding from Candid.
+// You may want to manually adjust some of the types.
+use ic_cdk::export::candid::{self, CandidType, Deserialize};
+use ic_cdk::api::call::CallResult;
+
+#[derive(CandidType, Deserialize)]
+enum TxError { InsufficientAllowance, InsufficientBalance }
+
+#[derive(CandidType, Deserialize)]
+enum Result { Ok(u64), Err(TxError) }
+
+#[derive(CandidType, Deserialize)]
+struct Metadata {
+  fee: u64,
+  decimals: u8,
+  fee_to: candid::Principal,
+  owner: candid::Principal,
+  logo: String,
+  name: String,
+  total_supply: u64,
+  symbol: String,
+}
+
+#[derive(CandidType, Deserialize)]
+struct TokenInfo {
+  deploy_time: u64,
+  holder_number: u64,
+  fee_to: candid::Principal,
+  history_size: u64,
+  metadata: Metadata,
+  cycles: u64,
+}
+
+#[derive(CandidType, Deserialize)]
+enum Operation { Approve, Mint, Transfer, TransferFrom }
+
+#[derive(CandidType, Deserialize)]
+struct OpRecord {
+  op: Operation,
+  to: candid::Principal,
+  fee: u64,
+  from: candid::Principal,
+  timestamp: u64,
+  caller: Option<candid::Principal>,
+  index: u64,
+  amount: u64,
+}
+
+struct minting_canister(candid::Principal);
+impl minting_canister{
+  pub async fn addTotalSupply(&self, arg0: u64) -> CallResult<(u64,)> {
+    ic_cdk::call(self.0, "addTotalSupply", (arg0,)).await
+  }
+  pub async fn allowance(
+    &self,
+    arg0: candid::Principal,
+    arg1: candid::Principal,
+  ) -> CallResult<(u64,)> {
+    ic_cdk::call(self.0, "allowance", (arg0,arg1,)).await
+  }
+  pub async fn approve(&self, arg0: candid::Principal, arg1: u64) -> CallResult<
+    (Result,)
+  > { ic_cdk::call(self.0, "approve", (arg0,arg1,)).await }
+  pub async fn balanceOf(&self, arg0: candid::Principal) -> CallResult<(u64,)> {
+    ic_cdk::call(self.0, "balanceOf", (arg0,)).await
+  }
+  pub async fn decimals(&self) -> CallResult<(u8,)> {
+    ic_cdk::call(self.0, "decimals", ()).await
+  }
+  pub async fn getAllowanceSize(&self) -> CallResult<(u64,)> {
+    ic_cdk::call(self.0, "getAllowanceSize", ()).await
+  }
+  pub async fn getHolders(&self, arg0: u64, arg1: u64) -> CallResult<
+    (Vec<(candid::Principal,u64,)>,)
+  > { ic_cdk::call(self.0, "getHolders", (arg0,arg1,)).await }
+  pub async fn getLogo(&self) -> CallResult<(String,)> {
+    ic_cdk::call(self.0, "getLogo", ()).await
+  }
+  pub async fn getMetadta(&self) -> CallResult<(Metadata,)> {
+    ic_cdk::call(self.0, "getMetadta", ()).await
+  }
+  pub async fn getTokenInfo(&self) -> CallResult<(TokenInfo,)> {
+    ic_cdk::call(self.0, "getTokenInfo", ()).await
+  }
+  pub async fn getTransaction(&self, arg0: u64) -> CallResult<(OpRecord,)> {
+    ic_cdk::call(self.0, "getTransaction", (arg0,)).await
+  }
+  pub async fn getTransactions(&self, arg0: u64, arg1: u64) -> CallResult<
+    (Vec<OpRecord>,)
+  > { ic_cdk::call(self.0, "getTransactions", (arg0,arg1,)).await }
+  pub async fn getUserApprovals(&self, arg0: candid::Principal) -> CallResult<
+    (Vec<(candid::Principal,u64,)>,)
+  > { ic_cdk::call(self.0, "getUserApprovals", (arg0,)).await }
+  pub async fn getUserTransactionAmount(
+    &self,
+    arg0: candid::Principal,
+  ) -> CallResult<(u64,)> {
+    ic_cdk::call(self.0, "getUserTransactionAmount", (arg0,)).await
+  }
+  pub async fn getUserTransactions(
+    &self,
+    arg0: candid::Principal,
+    arg1: u64,
+    arg2: u64,
+  ) -> CallResult<(Vec<OpRecord>,)> {
+    ic_cdk::call(self.0, "getUserTransactions", (arg0,arg1,arg2,)).await
+  }
+  pub async fn historySize(&self) -> CallResult<(u64,)> {
+    ic_cdk::call(self.0, "historySize", ()).await
+  }
+  pub async fn name(&self) -> CallResult<(String,)> {
+    ic_cdk::call(self.0, "name", ()).await
+  }
+  pub async fn owner(&self) -> CallResult<(candid::Principal,)> {
+    ic_cdk::call(self.0, "owner", ()).await
+  }
+  pub async fn setFee(&self, arg0: u64) -> CallResult<()> {
+    ic_cdk::call(self.0, "setFee", (arg0,)).await
+  }
+  pub async fn setFeeTo(&self, arg0: candid::Principal) -> CallResult<()> {
+    ic_cdk::call(self.0, "setFeeTo", (arg0,)).await
+  }
+  pub async fn setLogo(&self, arg0: String) -> CallResult<()> {
+    ic_cdk::call(self.0, "setLogo", (arg0,)).await
+  }
+  pub async fn setMetadta(
+    &self,
+    arg0: String,
+    arg1: String,
+    arg2: String,
+    arg3: u8,
+    arg4: u64,
+    arg5: candid::Principal,
+    arg6: u64,
+    arg7: candid::Principal,
+  ) -> CallResult<()> {
+    ic_cdk::call(self.0, "setMetadta", (
+      arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,
+    )).await
+  }
+  pub async fn setOwner(&self, arg0: candid::Principal) -> CallResult<()> {
+    ic_cdk::call(self.0, "setOwner", (arg0,)).await
+  }
+  pub async fn symbol(&self) -> CallResult<(String,)> {
+    ic_cdk::call(self.0, "symbol", ()).await
+  }
+  pub async fn totalSupply(&self) -> CallResult<(u64,)> {
+    ic_cdk::call(self.0, "totalSupply", ()).await
+  }
+  pub async fn transfer(
+    &self,
+    arg0: candid::Principal,
+    arg1: u64,
+  ) -> CallResult<(Result,)> {
+    ic_cdk::call(self.0, "transfer", (arg0,arg1,)).await
+  }
+  pub async fn transferFrom(
+    &self,
+    arg0: candid::Principal,
+    arg1: candid::Principal,
+    arg2: u64,
+  ) -> CallResult<(Result,)> {
+    ic_cdk::call(self.0, "transferFrom", (arg0,arg1,arg2,)).await
+  }
 }
