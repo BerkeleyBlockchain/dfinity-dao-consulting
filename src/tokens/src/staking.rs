@@ -66,89 +66,89 @@ fn convert(i: &[u8]) -> [u8; 32] {
     i.try_into().expect("wrong len")
 } 
 
-// pub async fn notify(
-//     caller: Principal,
-//     paid: Invoice,
-//     locktime: u64,
-//     block: u64
-// ) -> Result<(), String> {
-//     let LEDGER_CANISTER: Principal = ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
+pub async fn notify(
+    caller: Principal,
+    paid: Invoice,
+    locktime: u64,
+    block: u64
+) -> Result<(), String> {
+    let LEDGER_CANISTER: Principal = ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
     
-//     let mut hasher = sha2::Sha256::new();
-//     hasher.update(paid);
-//     let hash = hasher.finalize();
-//     let x = hash.as_slice();
-//     // let x = match x {
-//     //     Ok(hash) => hash,
-//     //     Err(error) => {
-//     //         "Hash doesn't work.".to_string();
-//     //     }
-//     // }
-//     // let x: [u8; 32] = hash.as_slice().try_into()?;
-//     let amt = ic::call(LEDGER_CANISTER, "account_balance", (AccountIdentifier::new(&api::id(), &Subaccount(convert(&*x))),)).await;
-//     // let amt = await ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash));
-//     let amt = match amt {
-//         Ok(amount) => amount,
-//         Err(error) => {
-//             return Err("Canister account balance call invalid.".to_string());
-//         }
-//     };
-//     // if (amt != paid.amount) {
-//     //     return Err("Canister subaccount did not receive invoice amount.".to_string());
-//     // }
-//     let utc: DateTime<Utc> = Utc::now();
-//     let seconds: u64 = utc.timestamp().unsigned_abs();
-//     let base: u64 = 10;
-//     let nanoseconds: u64 = seconds * base.pow(9);
-//     let memo = Memo(0);
-//     let x = hash.as_slice();
+    let mut hasher = sha2::Sha256::new();
+    hasher.update(paid);
+    let hash = hasher.finalize();
+    let x = hash.as_slice();
+    // let x = match x {
+    //     Ok(hash) => hash,
+    //     Err(error) => {
+    //         "Hash doesn't work.".to_string();
+    //     }
+    // }
+    // let x: [u8; 32] = hash.as_slice().try_into()?;
+    let amt = ic::call(LEDGER_CANISTER, "account_balance", (AccountIdentifier::new(&api::id(), &Subaccount(convert(&*x))),)).await;
+    // let amt = await ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash));
+    let amt = match amt {
+        Ok(amount) => amount,
+        Err(error) => {
+            return Err("Canister account balance call invalid.".to_string());
+        }
+    };
+    // if (amt != paid.amount) {
+    //     return Err("Canister subaccount did not receive invoice amount.".to_string());
+    // }
+    let utc: DateTime<Utc> = Utc::now();
+    let seconds: u64 = utc.timestamp().unsigned_abs();
+    let base: u64 = 10;
+    let nanoseconds: u64 = seconds * base.pow(9);
+    let memo = Memo(0);
+    let x = hash.as_slice();
 
-//     let subaccount : Option<Subaccount> = Some(Subaccount(convert(&*x)));
-//     let timestamp: Option<Timestamp> = Some(Timestamp {
-//         timestamp_nanos: nanoseconds
-//     });
-//     // ******* COMMENTED OUT DUE TO ERRORS *******
-//     // ic::call(LEDGER_CANISTER, "transfer", (TransferArgs {
-//     //     memo: memo,
-//     //     amount: Tokens::from_e8s(paid.amount),
-//     //     fee: ic_ledger_types::DEFAULT_FEE,
-//     //     from_subaccount: subaccount,
-//     //     to: AccountIdentifier::new(&api::id(), &ic_ledger_types::DEFAULT_SUBACCOUNT),
-//     //     created_at_time: timestamp
-//     // },)); 
+    let subaccount : Option<Subaccount> = Some(Subaccount(convert(&*x)));
+    let timestamp: Option<Timestamp> = Some(Timestamp {
+        timestamp_nanos: nanoseconds
+    });
+    // ******* COMMENTED OUT DUE TO ERRORS *******
+    // ic::call(LEDGER_CANISTER, "transfer", (TransferArgs {
+    //     memo: memo,
+    //     amount: Tokens::from_e8s(paid.amount),
+    //     fee: ic_ledger_types::DEFAULT_FEE,
+    //     from_subaccount: subaccount,
+    //     to: AccountIdentifier::new(&api::id(), &ic_ledger_types::DEFAULT_SUBACCOUNT),
+    //     created_at_time: timestamp
+    // },)); 
 
-//     // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
-//     let stakers = ic::get_mut::<Stakers>();
-//     let transactions = ic::get_mut::<Transactions>();
+    // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
+    let stakers = ic::get_mut::<Stakers>();
+    let transactions = ic::get_mut::<Transactions>();
     
-//     let current_stake = stakers.get(&caller).copied().unwrap_or(0);
-//     // ******* COMMENTED OUT DUE TO ERRORS ********
-//     //stakers.insert(caller, paid.amount + current_stake);
+    let current_stake = stakers.get(&caller).copied().unwrap_or(0);
+    // ******* COMMENTED OUT DUE TO ERRORS ********
+    //stakers.insert(caller, paid.amount + current_stake);
 
-//     let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
-//     // ******* COMMENTED OUT DUE TO ERRORS ********
-//     // let take_tx = Transaction {
-//     //     amount: paid.amount,
-//     //     time: nanoseconds,
-//     //     locktime: locktime,
-//     //     return_amount: calculateReturnLocked(caller, nanoseconds, locktime, paid.amount)
-//     // };
+    let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
+    // ******* COMMENTED OUT DUE TO ERRORS ********
+    // let take_tx = Transaction {
+    //     amount: paid.amount,
+    //     time: nanoseconds,
+    //     locktime: locktime,
+    //     return_amount: calculateReturnLocked(caller, nanoseconds, locktime, paid.amount)
+    // };
 
-//     // was tx_list before, but changed since it was giving error
-//     // ******* COMMENTED OUT DUE TO ERRORS ********
-//     // tx_map.insert(locktime + nanoseconds, take_tx);
+    // was tx_list before, but changed since it was giving error
+    // ******* COMMENTED OUT DUE TO ERRORS ********
+    // tx_map.insert(locktime + nanoseconds, take_tx);
 
-//     // add transfer function call
+    // add transfer function call
 
-//     // transfer voting tokens (don't delete) and add proper error handling
-//     let numVotes : u64 = calculateNumVoteTokens(paid.amount);
-//     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
-//     //ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
-//     ic::call(MINTING_CANISTER, "transfer", (caller, numVotes, ""))
-//         .await
-//         .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
-//     Ok(())
-// }
+    // transfer voting tokens (don't delete) and add proper error handling
+    let numVotes : u64 = calculateNumVoteTokens(paid.amount);
+    let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+    //ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
+    ic::call(MINTING_CANISTER, "transfer", (caller, numVotes, ""))
+        .await
+        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+    Ok(())
+}
 
 // pub async fn stake(
 //     caller: Principal,
