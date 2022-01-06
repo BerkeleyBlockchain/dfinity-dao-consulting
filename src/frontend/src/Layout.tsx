@@ -20,7 +20,7 @@ const Layout = () => {
         </div>
         <div />
         <div className="flex items-center justify-end">
-          {isConnected || true ? <Stake /> : <PlugConnect />}
+          {isConnected ? <Stake /> : <PlugConnect />}
         </div>
       </header>
       <main>{data === null ? <Loading /> : <Outlet />}</main>

@@ -17,7 +17,7 @@ const Stake = () => {
 
   const stake = async (amount: bigint) => {
     setIsLoading(true);
-    const result = await identity.wipc.approve(TOKENS_CANISTER, amount);
+    // const result = await identity.wipc.approve(TOKENS_CANISTER, amount);
     // TODO: error handling
     await identity.tokens.joinAsVoter(amount, 24n * 7n * NS_PER_HOUR);
     setIsLoading(false);
@@ -49,28 +49,28 @@ const Stake = () => {
       >
         <div className="flex items-center justify-center min-h-screen px-4">
           <Dialog.Overlay className="fixed inset-0 overflow-y-auto backdrop-blur-lg" />
-          <div className="relative bg-stone-900 max-w-md shadow-xl rounded-2xl p-6">
+          <div className="relative bg-stone-900 max-w-md shadow-xl rounded-2xl p-7">
             <div className="flex items-center">
-              <Dialog.Title className="flex-1 text-stone-100 text-xl leading-6 font-medium">
+              <Dialog.Title className="flex-1 text-stone-100 text-xl leading-relaxed">
                 Stake ICP
               </Dialog.Title>
               <button
                 ref={closeButtonRef}
                 className="transition ml-8 p-1 rounded
-                hover:bg-stone-700 active:scale-95"
+                text-stone-600 hover:bg-stone-800 active:scale-95"
                 onClick={() => setShowStakeModal(false)}
               >
                 <BigCross className="h-5 w-5" />
               </button>
             </div>
 
-            <Dialog.Description className="mt-2 text-sm">
+            <Dialog.Description className="mt-4 text-sm text-flow">
               Stake WICP to recieve governance tokens to vote on proposals.
               Depending on the length of time you stake your ICP for, you will
               recieve staking rewards.
             </Dialog.Description>
 
-            <div className="mt-4">
+            <div className="mt-6">
               <label
                 htmlFor="stake-amount"
                 className="block text-sm font-medium text-stone-300"
