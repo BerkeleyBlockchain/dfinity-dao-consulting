@@ -1,7 +1,7 @@
 // mod token;
-use std::{collections::HashMap, collections::LinkedList, str::FromStr};
+use std::{collections::HashMap, collections::LinkedList, str::FromStr, convert::TryInto};
 use ic_kit::{ic, Principal};
-use sha2::{Sha256};
+use sha2::{Sha256, Sha512, Digest};
 use serde::{Serialize, Deserialize};
 use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo, Timestamp, Tokens};
 use ic_cdk::api;
@@ -15,8 +15,8 @@ static APY: f64 = 0.08;
 static TIME_STEPS_PER_YEAR: u64 = 31536000;
 static FIRST_VOTE_COST: u64 = 10; // in ICP
 
-type Stakers = HashMap<Principal, f64>;
-type Unlocked = HashMap<Principal, f64>; // I think this should be an f64
+type Stakers = HashMap<Principal, u64>;
+type Unlocked = HashMap<Principal, u64>; // I think this should be an f64
 
 // This only allows 1 txn per second which may not be what we want. 
 // May be better to use BTreeSet<Transaction>
@@ -26,7 +26,7 @@ struct Transaction {
     amount: u64,
     time: u64,
     locktime: u64,
-    return_amount: f64
+    return_amount: u64
 }
 
 
@@ -61,6 +61,10 @@ pub fn get_invoice(
     return invoice;
 }
 
+fn convert(i: &[u8]) -> [u8; 32] {
+    i.try_into().expect("wrong len")
+} 
+
 pub async fn notify(
     caller: Principal,
     paid: Invoice,
@@ -69,10 +73,18 @@ pub async fn notify(
 ) -> Result<(), String> {
     let LEDGER_CANISTER: Principal = ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
     
-    let mut hasher = Sha256::new();
+    let mut hasher = sha2::Sha256::new();
     hasher.update(paid);
     let hash = hasher.finalize();
-    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier(hash)).await;
+    let x = hash.as_slice();
+    // let x = match x {
+    //     Ok(hash) => hash,
+    //     Err(error) => {
+    //         "Hash doesn't work.".to_string();
+    //     }
+    // }
+    // let x: [u8; 32] = hash.as_slice().try_into()?;
+    let amt = ic::call(LEDGER_CANISTER, "account_balance", (AccountIdentifier::new(&api::id(), &Subaccount(convert(&*x))),)).await;
     // let amt = await ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash));
     let amt = match amt {
         Ok(amount) => amount,
@@ -88,25 +100,26 @@ pub async fn notify(
     let base: u64 = 10;
     let nanoseconds: u64 = seconds * base.pow(9);
     let memo = Memo(0);
-    let subaccount = Subaccount(hash);
-    let timestamp: Timestamp = Timestamp {
+    let x = hash.as_slice();
+
+    let subaccount : Option<Subaccount> = Some(Subaccount(convert(&*x)));
+    let timestamp: Option<Timestamp> = Some(Timestamp {
         timestamp_nanos: nanoseconds
-    };
-    let transfer : TransferArgs = TransferArgs {
+    });
+    ic::call(LEDGER_CANISTER, "transfer", (TransferArgs {
         memo: memo,
         amount: Tokens::from_e8s(paid.amount),
         fee: ic_ledger_types::DEFAULT_FEE,
         from_subaccount: subaccount,
-        to: AccountIdentifier(api::id(), ic_ledger_types::DEFAULT_SUBACCOUNT),
+        to: AccountIdentifier::new(&api::id(), &ic_ledger_types::DEFAULT_SUBACCOUNT),
         created_at_time: timestamp
-    };
-    ic::call(LEDGER_CANISTER, "transfer", transfer); 
+    },)); 
 
     // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
     let stakers = ic::get_mut::<Stakers>();
     let transactions = ic::get_mut::<Transactions>();
     
-    let current_stake = stakers.get(&caller).copied().unwrap_or(0.0);
+    let current_stake = stakers.get(&caller).copied().unwrap_or(0);
 
     stakers.insert(caller, paid.amount + current_stake);
 
@@ -180,7 +193,7 @@ pub async fn notify(
 
 fn removeUnlocked(
     caller: Principal,
-    amount: f64,
+    amount: u64,
     timestamp: u64
 ) -> bool {
     //transfer out
@@ -199,11 +212,11 @@ fn removeUnlocked(
 fn removeUnlockedAll(
     caller: Principal,
     timestamp: u64,
-) -> f64 {
+) -> u64 {
     unlockFunds(caller, timestamp);
     let unlock_amt = getUnlockedAmount(caller, timestamp);
     let unlocked = ic::get_mut::<Unlocked>();
-    unlocked.insert(caller, 0.0);
+    unlocked.insert(caller, 0);
     unlock_amt
 }
 
@@ -216,7 +229,7 @@ fn unlockFunds(
     let unlocked = ic::get_mut::<Unlocked>();
 
     // TODO: is this right? Should the unlocked default to zero
-    let mut new_unlock = unlocked.get(&caller).copied().unwrap_or(0.0);
+    let mut new_unlock = unlocked.get(&caller).copied().unwrap_or(0);
 
     if let Some(tx_map) = transactions.get_mut(&caller) {
         tx_map.retain(|&time, tx| {
@@ -236,7 +249,7 @@ fn unlockFunds(
 fn getUnlockedAmount(
     caller: Principal,
     timestamp: u64,
-) -> f64 {
+) -> u64 {
     let unlocked = ic::get_mut::<Unlocked>();
     *unlocked.get(&caller).unwrap()
 }
@@ -279,9 +292,10 @@ fn calculateReturnLocked(
     timestamp: u64,
     locktime: u64,
     amount: u64
-) -> f64 {
+) -> u64 {
     let num_years = (locktime as f64) / (TIME_STEPS_PER_YEAR as f64);
-    num_years * APY * (amount as f64) + (amount as f64)
+    let r_float = num_years * APY * (amount as f64) + (amount as f64);
+    r_float as u64
 }
 
 fn calculateNumVoteTokens(

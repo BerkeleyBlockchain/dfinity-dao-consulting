@@ -130,7 +130,7 @@ pub async fn firstVote(
 pub fn secondVote(
     from: Principal,
     metadata: LinkedList<Principal>
-) {
+) -> Result<(), String> {
     let vote2 = ic::get_mut::<Vote2>();
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
@@ -143,8 +143,8 @@ pub fn secondVote(
     let count = vote2.len();
     for applicant in vote2.into_iter() {
         ic::call(MINTING_CANISTER, "transfer", (from, applicant, count, ""));
-        // .await
-        // .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+        .await
+        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
         count -= 1;
 
     }
