@@ -1,4 +1,5 @@
 use std::collections::{HashMap, BTreeMap, LinkedList};
+use std::vec::{Vec};
 use std::str::FromStr;
 use ic_cdk_macros::import;
 use ic_kit::{ic, Principal};
@@ -8,7 +9,7 @@ type Results1 = BTreeMap<Principal, VoteStatus>;
 type Results2 = BTreeMap<Principal, u64>;
 type Winners1 = LinkedList<Principal>;
 type GrantSizes = LinkedList<u64>;
-type VotingPeriods = LinkedList<Tuple>;
+type VotingPeriods = LinkedList<Vec<u64>>;
 
 type Vote2 = BTreeMap<Principal, LinkedList<Principal>>;
 
@@ -85,12 +86,12 @@ pub async fn firstVote(
 ) -> Result<(), String> {
     // check if in the right voting period
     let from : Principal = ic::caller();
-    let voting_periods = ic::get::<VotingPeriods>;
-    // TODO: not sure how to deal with timestamps and debug
-    let current_period = voting_periods.val;
-    if (timestamp < current_period[0]) && (timestamp > current_period[1]) {
-        return Err("Not correct voting period".to_string());
-    }
+    let voting_periods = ic::get::<VotingPeriods>();
+    // TODO: deal with timestamps
+    let current_period = &voting_periods.into_iter();
+    // if (timestamp < current_period[0]) && (timestamp > current_period[1]) {
+    //     return Err("Not correct voting period".to_string());
+    // }
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
 
@@ -127,10 +128,10 @@ pub async fn firstVote(
     Ok(())
 }
 
-pub fn secondVote(
+pub async fn secondVote(
     from: Principal,
     metadata: LinkedList<Principal>
-) -> Result<(), String> {
+) -> () {
     let vote2 = ic::get_mut::<Vote2>();
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     let BURN_ID: Principal = Principal::from_str("0x9762D80271de8fa872A2a1f770E2319c3DF643bC").unwrap();
@@ -142,9 +143,8 @@ pub fn secondVote(
     // TODO: DEBUG
     let count = vote2.len();
     for applicant in vote2.into_iter() {
-        ic::call(MINTING_CANISTER, "transfer", (from, applicant, count, ""));
-        .await
-        .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+        ic::call(MINTING_CANISTER, "transfer", (from, applicant, count, ""))
+        .await.map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
         count -= 1;
 
     }
@@ -170,9 +170,11 @@ pub fn addVotingPeriod (
     end: u64
 ) {
     // add start and end to list of tuples
-    let voting_periods = ic::get_mut::<VotingPeriods>;
-    // TODO: is this how you create a tuple in rust?
-    voting_periods.push_back((start, end));
+    let voting_periods = ic::get_mut::<VotingPeriods>();
+    let mut vec = Vec::new();
+    vec.push(start);
+    vec.push(end);
+    voting_periods.push_back(vec);
 }
 
 // time lock
