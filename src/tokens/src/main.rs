@@ -90,9 +90,9 @@ fn getNumVotes(icpAdded: u32, currVotes: u32) -> String {
 #[update]
 fn castFirstVote(
     application: Principal,
-    decision: u64
+    decision: bool
 ) {
-    let utc: DateTime<Utc> = Utc::now()
+    let utc: DateTime<Utc> = Utc::now();
     voting::firstVote(ic::caller(), application, decision, utc.timestamp());
 }
 
@@ -106,6 +106,7 @@ fn castSecondVote(
 }
 
 // setting grant sizes
+#[update]
 fn grantSizes(
     sizes:LinkedList<u64>
 ) {

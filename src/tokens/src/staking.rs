@@ -3,7 +3,7 @@ use std::{collections::HashMap, collections::LinkedList, str::FromStr};
 use ic_kit::{ic, Principal};
 use sha2::{Sha256};
 use serde::{Serialize, Deserialize};
-use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo, Timestamp};
+use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo, Timestamp, Tokens};
 use ic_cdk::api;
 use chrono::prelude::*;
 //https://github.com/dfinity/examples/tree/master/rust/tokens_transfer
@@ -54,15 +54,17 @@ impl AsRef<[u8]> for Invoice {
 // NNS Ledger Canlista: https://k7gat-daaaa-aaaae-qaahq-cai.ic0.app/listing/nns-ledger-10244/ryjl3-tyaaa-aaaaa-aaaba-cai
 pub fn get_invoice(
     amount: u64
-) {
+) -> Invoice {
     let invoice = Invoice {
         amount: amount
     };
     return invoice;
 }
 
-pub fn notify(
+pub async fn notify(
+    caller: Principal,
     paid: Invoice,
+    locktime: u64,
     block: u64
 ) -> Result<(), String> {
     let LEDGER_CANISTER: Principal = ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
@@ -70,7 +72,14 @@ pub fn notify(
     let mut hasher = Sha256::new();
     hasher.update(paid);
     let hash = hasher.finalize();
-    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash))?;
+    let amt = ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier(hash)).await;
+    // let amt = await ic::call(LEDGER_CANISTER, "account_balance", AccountIdentifier::new(api::id(), hash));
+    let amt = match amt {
+        Ok(amount) => amount,
+        Err(error) => {
+            return Err("Canister account balance call invalid.".to_string());
+        }
+    };
     if (amt != paid.amount) {
         return Err("Canister subaccount did not receive invoice amount.".to_string());
     }
@@ -78,13 +87,20 @@ pub fn notify(
     let seconds: u64 = utc.timestamp().unsigned_abs();
     let base: u64 = 10;
     let nanoseconds: u64 = seconds * base.pow(9);
-    ic::call(LEDGER_CANISTER, "transfer", TransferArgs( 
-        memo: Memo(0),
-        amount: paid.amount,
+    let memo = Memo(0);
+    let subaccount = Subaccount(hash);
+    let timestamp: Timestamp = Timestamp {
+        timestamp_nanos: nanoseconds
+    };
+    let transfer : TransferArgs = TransferArgs {
+        memo: memo,
+        amount: Tokens::from_e8s(paid.amount),
         fee: ic_ledger_types::DEFAULT_FEE,
-        from_subaccount: Subaccount(hash),
+        from_subaccount: subaccount,
         to: AccountIdentifier(api::id(), ic_ledger_types::DEFAULT_SUBACCOUNT),
-        created_at_time: Timestamp(nanoseconds)));
+        created_at_time: timestamp
+    };
+    ic::call(LEDGER_CANISTER, "transfer", transfer); 
 
     // copied from stake fn below (above is to verify user placed appropriate funds in one-time account)
     let stakers = ic::get_mut::<Stakers>();
@@ -92,19 +108,19 @@ pub fn notify(
     
     let current_stake = stakers.get(&caller).copied().unwrap_or(0.0);
 
-    stakers.insert(caller, amount + current_stake);
+    stakers.insert(caller, paid.amount + current_stake);
 
     let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
 
     let take_tx = Transaction {
         amount: paid.amount,
-        time: timestamp,
+        time: nanoseconds,
         locktime: locktime,
-        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, paid.amount)
+        return_amount: calculateReturnLocked(caller, nanoseconds, locktime, paid.amount)
     };
 
     // was tx_list before, but changed since it was giving error
-    tx_map.insert(locktime + timestamp, take_tx);
+    tx_map.insert(locktime + nanoseconds, take_tx);
 
     // add transfer function call
 
@@ -112,45 +128,45 @@ pub fn notify(
     let numVotes : u64 = calculateNumVoteTokens(paid.amount);
     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
     ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
-    Ok(());
+    Ok(())
 }
 
-pub async fn stake(
-    caller: Principal,
-    amount: u64,
-    fee: u64,
-    locktime: u64,
-    timestamp: u64,
-) {
-    let stakers = ic::get_mut::<Stakers>();
-    let transactions = ic::get_mut::<Transactions>();
+// pub async fn stake(
+//     caller: Principal,
+//     amount: u64,
+//     fee: u64,
+//     locktime: u64,
+//     timestamp: u64,
+// ) {
+//     let stakers = ic::get_mut::<Stakers>();
+//     let transactions = ic::get_mut::<Transactions>();
     
-    let current_stake = stakers.get(&caller).copied().unwrap_or(0);
+//     let current_stake = stakers.get(&caller).copied().unwrap_or(0);
 
-    stakers.insert(caller, amount + current_stake);
+//     stakers.insert(caller, amount + current_stake);
 
-    let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
+//     let tx_map = transactions.entry(caller).or_insert_with(|| HashMap::new());
 
-    let take_tx = Transaction {
-        amount: amount,
-        time: timestamp,
-        locktime: locktime,
-        return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
-    };
+//     let take_tx = Transaction {
+//         amount: amount,
+//         time: timestamp,
+//         locktime: locktime,
+//         return_amount: calculateReturnLocked(caller, fee, timestamp, locktime, amount)
+//     };
 
-    // was tx_list before, but changed since it was giving error
-    tx_map.insert(locktime + timestamp, take_tx);
+//     // was tx_list before, but changed since it was giving error
+//     tx_map.insert(locktime + timestamp, take_tx);
 
-    // add transfer function call
+//     // add transfer function call
 
-    // transfer voting tokens (don't delete) and add proper error handling
-    let numVotes : u64 = calculateNumVoteTokens(amount);
-    let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
-    ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
-        // .await
-        // .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
+//     // transfer voting tokens (don't delete) and add proper error handling
+//     let numVotes : u64 = calculateNumVoteTokens(amount);
+//     let MINTING_CANISTER: Principal = Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
+//     ic::call(MINTING_CANISTER, "transfer", (caller, numVotes));
+//         // .await
+//         // .map_err(|(code, msg)| format!("Call failed with code={}: {}", code as u8, msg))?;
 
-}
+// }
 
 // pub fn get_stakers() -> &LinkedList<Principal> {
 //     let staker_map = ic::get::<Stakers>();
@@ -165,14 +181,13 @@ pub async fn stake(
 fn removeUnlocked(
     caller: Principal,
     amount: f64,
-    fee: u64,
     timestamp: u64
 ) -> bool {
     //transfer out
-    unlockFunds(caller, fee, timestamp);
-    let amt_avail = getUnlockedAmount(caller, fee, timestamp);
+    unlockFunds(caller, timestamp);
+    let amt_avail = getUnlockedAmount(caller, timestamp);
     if amount > amt_avail {
-        let unlock_amt = getUnlockedAmount(caller, fee, timestamp);
+        let unlock_amt = getUnlockedAmount(caller, timestamp);
         let unlocked = ic::get_mut::<Unlocked>();
         unlocked.insert(caller, unlock_amt - amount);
         true
@@ -183,11 +198,10 @@ fn removeUnlocked(
 
 fn removeUnlockedAll(
     caller: Principal,
-    fee: u64,
     timestamp: u64,
 ) -> f64 {
-    unlockFunds(caller, fee, timestamp);
-    let unlock_amt = getUnlockedAmount(caller, fee, timestamp);
+    unlockFunds(caller, timestamp);
+    let unlock_amt = getUnlockedAmount(caller, timestamp);
     let unlocked = ic::get_mut::<Unlocked>();
     unlocked.insert(caller, 0.0);
     unlock_amt
@@ -195,7 +209,6 @@ fn removeUnlockedAll(
 
 fn unlockFunds(
     caller: Principal,
-    fee: u64,
     timestamp: u64,
 ) {
     let stakers = ic::get_mut::<Stakers>();
@@ -222,7 +235,6 @@ fn unlockFunds(
 
 fn getUnlockedAmount(
     caller: Principal,
-    fee: u64,
     timestamp: u64,
 ) -> f64 {
     let unlocked = ic::get_mut::<Unlocked>();
@@ -264,7 +276,6 @@ fn getUnlockedAmount(
 
 fn calculateReturnLocked(
     caller: Principal,
-    fee: u64,
     timestamp: u64,
     locktime: u64,
     amount: u64
