@@ -1,7 +1,7 @@
-use std::collections::{HashMap, BTreeMap, LinkedList};
+use std::collections::{BTreeMap, LinkedList};
 use std::vec::{Vec};
 use std::str::FromStr;
-use ic_cdk_macros::import;
+// use ic_cdk_macros::import;
 use ic_kit::{ic, Principal};
 use candid::{CandidType, Deserialize};
 
@@ -45,6 +45,13 @@ pub fn add_application(
     caller: Principal,
     application: Application
 ) {
+    let results1 = ic::get_mut::<Results1>();
+    let mut votes = VoteStatus {
+        yes: 0,
+        no: 0
+    };
+    results1.insert(application.principal, votes);
+    
     let applicants = ic::get_mut::<Applications>();
     applicants.insert(caller, application);
 }
@@ -53,7 +60,7 @@ pub fn setGrantSizes(
     sizes: LinkedList<u64>
 ) {
     let grant_sizes = ic::get_mut::<GrantSizes>();
-    for value in sizes.iter_mut() {
+    for value in sizes.iter() {
         grant_sizes.push_back(*value);
     }
 }
@@ -61,10 +68,10 @@ pub fn setGrantSizes(
 fn secondVoteScores() {
     let vote2 = ic::get::<Vote2>();
     let results2 = ic::get_mut::<Results2>();
-    let count : u64 = 0;
+    let mut count : u64 = 0;
     for (key, value) in vote2.into_iter() {
         count = value.len() as u64; // depends on how many they ranked
-       for applicant in value.into_iter() {
+        for applicant in value.into_iter() {
             if let Some(x) = results2.get_mut(applicant) {
                 *x += count;
             }
