@@ -4,8 +4,12 @@ type Application = record {
   proposal : Proposal;
 };
 type Proposal = record { grant_size : nat64; name : text; description : text };
+type Invoice = record {amount: nat64; random: nat64};
+type Result = variant {T: bool; E: text};
+
 service : {
   getApps : () -> (vec Application) query;
-  joinAsVoter : (nat64, nat64) -> ();
+  joinAsVoter : (nat64, nat64) -> (Invoice) query;
   submitApp : (Proposal) -> ();
+  stake: (Invoice, nat64, nat64) -> (bool);
 }

@@ -33,15 +33,27 @@ pub fn get_apps() -> Vec<&'static voting::Application> {
 // not sure what the "fee" argument is in the stake function
 // make sure quadratic staking is working
 // Joins as voter and stakes some token.
-#[update(name = "joinAsVoter")]
-#[candid_method(update, rename = "joinAsVoter")]
+#[query(name = "joinAsVoter")]
+#[candid_method(query, rename = "joinAsVoter")]
 pub fn join_as_voter(
     amount: u64,
     locktime: u64,
 
-) {
+) -> staking::Invoice {
     static STAKING_FEE: u64 = 0; // No staking fee for now
+    staking::get_invoice(amount)
     // staking::stake(ic::caller(), amount, STAKING_FEE, locktime, ic::time());
+}
+
+#[update(name = "stake")]
+#[candid_method(update, rename = "stake")]
+pub async fn stake(
+    paid: staking::Invoice,
+    locktime: u64,
+    block: u64
+) -> bool{
+    let result = staking::notify(ic::caller(), paid, locktime, block).await;
+    return result.is_ok();
 }
 
 // create vote tokens, everytime local network is spun up

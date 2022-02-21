@@ -2,7 +2,8 @@
 use std::{collections::HashMap, str::FromStr, convert::TryInto};
 use ic_kit::{ic, Principal};
 use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
+use serde::{Serialize};
+use candid::{CandidType, Deserialize};
 use ic_ledger_types::{AccountBalanceArgs, AccountIdentifier, Subaccount, TransferArgs, Memo, Timestamp, Tokens, TransferResult};
 use ic_cdk::api;
 use chrono::prelude::*;
@@ -35,7 +36,7 @@ pub fn get_source_token_principal() -> Principal {
     return Principal::from_str("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap();
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, CandidType, Clone, Debug)]
 pub struct Invoice {
     amount: u64,
     random: u64
